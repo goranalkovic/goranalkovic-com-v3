@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import Logo from '$lib/Logo.svelte';
+	import ThemePicker from './ThemePicker.svelte';
 </script>
 
 <header
@@ -27,6 +28,7 @@
 			<li><a sveltekit:prefetch href="/#contact">Contact</a></li>
 		</ul>
 
+		<ThemePicker />
 		<button class="flex sm:hidden">Menu</button>
 	</nav>
 </header>
