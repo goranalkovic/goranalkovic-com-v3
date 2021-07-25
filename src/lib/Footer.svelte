@@ -5,7 +5,7 @@
 <footer
 class="border-t border-rich-purple-500 dark:border-rich-purple-300 border-opacity-5 dark:border-opacity-10 p-30 sm:px-60 sm:py-30 w-full"
 >
-<div class="contained-width">
+<div class="contained">
     <div class="flex items-center gap-5 text-18 flex-shrink-0 mb-15">
         <Logo small />
         <span>&copy; 2021</span>
