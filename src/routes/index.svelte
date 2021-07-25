@@ -2,16 +2,20 @@
 	import ArrowButton, { ArrowDirections } from '$lib/ArrowButton.svelte';
 	import AboutImage from '$lib/AboutImage.svelte';
 	import WorkShowcaseCard from '$lib/WorkShowcaseCard.svelte';
+	import ContactItem from '$lib/ContactItem.svelte';
 </script>
 
 <svelte:head>
 	<title>Goran Alković - Developer & designer</title>
-	<meta name="description" content="Goran Alković - a frontend developer that also likes to design.">
+	<meta
+		name="description"
+		content="Goran Alković - a frontend developer that also likes to design."
+	/>
 </svelte:head>
 
-<section id="intro" class="mt-120 md:mt-60 mb-100 md:mb-100">
-	<h1 class="text-48 md:text-96 font-bold max-w-[68rem]">
-		<span class="text-transparent text-stroke-black dark:text-stroke-white text-stroke-DEFAULT">
+<section id="intro" class="content-padding h-[90vh] !py-0 flex flex-col justify-center">
+	<h1 class="max-w-[68rem]">
+		<span class="text-transparent text-stroke-1 text-stroke-black dark:text-stroke-white">
 			Hi! I'm Goran.
 		</span>
 		<br />
@@ -26,12 +30,10 @@
 	/>
 </section>
 
-<section class="lg:flex lg:flex-row-reverse lg:-mr-30" id="about">
+<section class="content-padding lg:flex lg:flex-row-reverse md:col-start-2 md:col-span-2" id="about">
 	<AboutImage />
-	<div class="flex flex-col gap-15 max-w-lg lg:max-w-420 md:mr-px">
-		<h2 class="text-40 md:text-80 mt-48 lg:mt-0 mb-15 lg:mb-30 font-bold">
-			<span class="purple-text">About</span> me
-		</h2>
+	<div class="flex flex-col gap-15 max-w-lg lg:max-w-420 md:mr-px mt-30 sm:mt-60 lg:mt-0 lg:mr-30">
+		<h2><span class="purple-text">About</span> me</h2>
 		<p>
 			I’m a frontend developer who also likes to design. My philosophy is that everything should be
 			visually pleasing and easy to use, besides just doing its job.
@@ -53,57 +55,102 @@
 			game a bit here and there.
 		</p>
 		<ArrowButton content="Read my CV" url="/about" extraClass="mt-15 md:mt-30" />
-		<ArrowButton content="Explore my work" url="#work" extraClass="mt-15" arrowDirection={ArrowDirections.DOWN} />
+		<ArrowButton
+			content="Explore my work"
+			url="#work"
+			extraClass="mt-15"
+			arrowDirection={ArrowDirections.DOWN}
+		/>
 	</div>
 </section>
 
-<section class="sm:grid sm:grid-cols-2 sm:gap-30 sm:auto-rows-auto" id="work">
-	<h2 class="text-40 md:text-80 mt-48 sm:mt-0 mb-15 font-bold sm:max-w-sm">
-		Some of my <span class="purple-text">work</span>
-	</h2>
-	<WorkShowcaseCard
-		name="Goc's recipe book"
+<section class="content-padding" id="work">
+	
+
+	<div class="sm:grid sm:grid-cols-2 sm:gap-15 md:gap-30 lg:grid-rows-[min,1fr,1fr,6rem]">
+		<h2 class="mb-30 sm:mb-15 md:mb-0 sm:col-span-2 lg:col-span-1">Some of my <span class="purple-text">work</span></h2>
+		<WorkShowcaseCard
+			name="Goc's recipe book"
+			url="https://recipes.goranalkovic.com"
+			imageFilename="recipes"
+			desktopTextVerAlignBottom
+			extraClass="lg:col-start-2 lg:row-start-1 lg:row-span-2"
+			lightColor="#CE0F4C"
+		/>
+		<WorkShowcaseCard
+			name="SocialByte"
+			url="https://socialbyte.agency"
+			imageFilename="socialbyte"
+			desktopTextHorAlignEnd
+			desktopTextVerAlignBottom
+		/>
+		<WorkShowcaseCard
+			name="STEM Games 2019"
+			url="#"
+			imageFilename="stemgames"
+			desktopTextHorAlignEnd
+			extraClass="md:row-span-2"
+			lightColor="#06354A"
+		/>
+		<WorkShowcaseCard
+			name="Browser piano"
+			url="https://piano.goranalkovic.com"
+			imageFilename="piano"
+		/>
+		<ArrowButton
+		content="See more"
 		url="#"
-		imageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/recipes-light_CBuuzFsxnI.png?updatedAt=1627165988227"
-		mobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/recipes-mobile-light_XWcpickYcWy.png?updatedAt=1627165988012"
-		darkImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/recipes-dark_dxtEc90MB.png?updatedAt=1627165987564"
-		darkMobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/recipes-mobile-dark_zfLf4dnSHD.png?updatedAt=1627165987852"
-		desktopTextVerAlignBottom
-		extraClass='sm:col-start-2 sm:row-start-1 sm:row-span-2'
-		lightColor='#CE0F4C'
-	/>
-	<WorkShowcaseCard
-		name="SocialByte"
-		url="#"
-		imageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/socialbyte-light_6Fs5-KvVHZ.png?updatedAt=1627165987943"
-		mobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/socialbyte-mobile-light_46G2pDGDGZ6.png?updatedAt=1627165988015"
-		darkImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/socialbyte-dark_KM_w1H6OX.png?updatedAt=1627165987738"
-		darkMobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/socialbyte-mobile-dark_QZq8k78asl.png?updatedAt=1627165987903"
-		desktopTextHorAlignEnd
-		desktopTextVerAlignBottom
-	/>
-	<WorkShowcaseCard
-		name="STEM Games 2019"
-		url="#"
-		imageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/stemgames-light_k4ULUo0nk8.png?updatedAt=1627165989027"
-		mobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/stemgames-mobile-light_13ucLiqCy.png?updatedAt=1627165989031"
-		darkImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/stemgames-dark_kgvG_ykqN.png?updatedAt=1627165988771"
-		darkMobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/stemgames-mobile-dark_1hAUMDfN0W.png?updatedAt=1627165988788"
-		desktopTextHorAlignEnd
-		extraClass='sm:row-span-2'
-		lightColor='#06354A'
-	/>
-	<WorkShowcaseCard
-		name="Browser piano"
-		url="#"
-		imageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/piano-light_UmAFBIU3D.png?updatedAt=1627165985952"
-		mobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/piano-mobile-light_unCuRJAfVG.png?updatedAt=1627165986293"
-		darkImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/piano-dark_Kr8fRagSe6.png?updatedAt=1627165985722"
-		darkMobileImageUrl="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-home_workcard/piano-mobile-dark_yIBhRQQBTG.png?updatedAt=1627165986143"
-	/>
+		extraClass="mt-15 sm:mt-30 md:mt-0 sm:col-start-1 lg:col-start-2 sm:!w-full h-full lg:justify-center rounded-md lg:border lg:border-gray-200 lg:hover:border-rich-purple-500 lg:hover:border-opacity-50 lg:dark:border-rich-purple-300 lg:dark:border-opacity-10 lg:dark:hover:border-opacity-50 lg:dark:hover:border-rich-purple-300 !transition"
+		/>
+	</div>
 </section>
 
-<style>
+<section id="contact" class="content-padding mb-[20vh]">
+	<h2><span class="purple-text">Contact</span> & socials</h2>
+
+	<div
+		class="flex flex-col gap-30 mt-30 sm:mt-60 md:grid md:grid-cols-2 lg:grid-rows-2 lg:auto-cols-fr lg:grid-flow-col md:gap-x-30 md:gap-y-48 lg:gap-y-60 w-full"
+	>
+		<ContactItem
+			title="E-mail"
+			contact="contact@goranalkovic.com"
+			buttonCaption="Send an email"
+			buttonUrl="mailto:contact@goranalkovic.com"
+		/>
+		<ContactItem
+			title="Phone"
+			contactPrefix="+385 "
+			contact="976 480 800"
+			buttonCaption="Open in dialer"
+			buttonUrl="tel:+385976480800"
+		/>
+		<ContactItem
+			title="GitHub"
+			contactPrefix="github.com/"
+			contact="goranalkovic"
+			buttonCaption="View my repos"
+			buttonUrl="https://github.com/goranalkovic"
+		/>
+		<ContactItem
+			title="LinkedIn"
+			contactPrefix="linkedin.com/in/"
+			contact="goran-alković-b9569379"
+			buttonCaption="Connect with me"
+			buttonUrl="https://www.linkedin.com/in/goran-alkovi%C4%87-b9569379"
+		/>
+		<div class="lg:row-span-2">
+			<ContactItem
+				title="Unsplash"
+				contactPrefix="unsplash.com/"
+				contact="@goran_alkovic"
+				buttonCaption="Explore my photos"
+				buttonUrl="https://unsplash.com/@goran_alkovic"
+			/>
+		</div>
+	</div>
+</section>
+
+<style lang="postcss">
 	section {
 		@apply pt-120 md:pt-180 pb-60 md:pb-60;
 	}

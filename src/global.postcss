@@ -1,0 +1,35 @@
+body {
+    @apply bg-white dark:bg-rich-purple-900 text-black dark:text-white transition-colors;
+}
+
+main > * {
+    @apply col-start-2 col-end-2;
+}
+
+html {
+    overflow-x: hidden;
+}
+html,
+body {
+    scroll-behavior: smooth;
+}
+
+.purple-text {
+    @apply text-rich-purple-500 dark:text-rich-purple-300;
+}
+
+footer p a {
+    @apply font-medium hover:text-rich-purple-500 dark:hover:text-rich-purple-300;
+}
+
+.contained-width {
+    @apply max-w-7xl mx-auto;
+}
+
+h1 {
+    @apply text-48 md:text-96 font-bold;
+}
+
+h2 {
+    @apply text-40 md:text-60 mt-48 sm:mt-0 mb-15 font-bold;
+}

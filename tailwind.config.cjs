@@ -4,7 +4,7 @@ const config = {
     darkMode: 'media',
     mode: 'jit',
     purge: [
-        './src/**/*.{html,js,svelte,ts}',
+        './src/**/*.{html,js,svelte,ts,md,mdx}',
     ],
     theme: {
         colors: {
@@ -26,6 +26,7 @@ const config = {
                 letterSpacing: '0.13125em',
                 lineHeight: '1',
             }],
+            '16': ['1rem', '1.5'],
             '18': ['1.125rem', '1.5'],
             '24': ['1.5rem', {
                 letterSpacing: '-0.03em',
@@ -36,6 +37,10 @@ const config = {
                 lineHeight: '0.95',
             }],
             '48': ['3rem', {
+                letterSpacing: '-0.03em',
+                lineHeight: '0.95',
+            }],
+            '60': ['3.75rem', {
                 letterSpacing: '-0.03em',
                 lineHeight: '0.95',
             }],
@@ -64,7 +69,22 @@ const config = {
             '120': '7.5rem',
             '160': '10rem',
             '180': '11.25rem',
+            '300': '18.75rem',
             '420': '26.25rem',
+        },
+        textFillColor: theme => theme('borderColor'),
+        textStrokeColor: theme => theme('borderColor'),
+        textStrokeWidth: {
+            ...theme => theme('borderWidth'),
+            '1': '1px',
+        },
+        paintOrder: {
+            'fsm': { paintOrder: 'fill stroke markers' },
+            'fms': { paintOrder: 'fill markers stroke' },
+            'sfm': { paintOrder: 'stroke fill markers' },
+            'smf': { paintOrder: 'stroke markers fill' },
+            'mfs': { paintOrder: 'markers fill stroke' },
+            'msf': { paintOrder: 'markers stroke fill' },
         },
         extend: {
             fontFamily: {
@@ -87,6 +107,10 @@ const config = {
     variants: {
         extend: {
             fill: ['hover', 'focus', 'dark'],
+            textFillColor: ['responsive', 'dark'],
+            textStrokeColor: ['responsive', 'dark'],
+            textStrokeWidth: ['responsive', 'dark'],
+            paintOrder: ['responsive', 'dark'],
         }
     },
     plugins: [
