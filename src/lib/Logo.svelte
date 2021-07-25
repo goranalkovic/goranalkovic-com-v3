@@ -1,16 +1,26 @@
 <script>
-    export let small = false;
-    export let color = false;
+	export let small = false;
+	export let color = false;
 </script>
 
-<svg class="h-36 w-36 rounded" class:small={small} width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h400v400H0V0z" class:letter-color={color} class="fill-current"/><path d="M148.649 153.313l76.698-6.036C212.777 85.419 153.57 45.562 81.006 51.273c-83.74 6.59-145.236 70.734-137.164 173.304 7.808 99.202 73.569 155.796 163.432 148.723 80.678-6.349 134.453-60.952 127.826-145.151l-3.265-41.487-135.178 10.639 4.35 55.265 62.154-4.892c1.837 33.128-19.476 55.908-60.504 59.137-46.998 3.699-76.83-28.92-81.577-89.237-4.71-59.858 21.218-96.403 66.686-99.981 30.311-2.386 52.147 10.837 60.883 35.72zM309.33 353.085l15.486-67.455 108.234-8.518 25.848 64.202 81.444-6.41-130.46-305.202-100.886 7.94-81.11 321.853 81.444-6.41zm29.021-126.438l26.004-113.878 2.449-.193 43.652 108.396-72.105 5.675z" class="fill-white dark:fill-rich-purple-900" /></svg>
+<svg
+	class="h-36 w-36 rounded"
+	class:small
+	width="36"
+	height="36"
+	viewBox="0 0 36 36"
+fill="none"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<path d="M0 0h36v36H0V0z" class="{color ? 'fill-rich-purple-500 dark:fill-rich-purple-300' : 'fill-current'} transition-colors" />
+	<path
+		d="M13.378 13.798l6.903-.543c-1.131-5.567-6.46-9.154-12.99-8.64-7.537.593-13.072 6.366-12.345 15.597.702 8.928 6.62 14.022 14.709 13.385 7.26-.571 12.1-5.486 11.504-13.063l-.294-3.734-12.166.957.392 4.974 5.593-.44c.166 2.981-1.752 5.032-5.445 5.322-4.23.333-6.915-2.603-7.342-8.031-.424-5.387 1.91-8.676 6.002-8.998 2.728-.215 4.693.975 5.48 3.214zM27.84 31.778l1.393-6.071 9.741-.767 2.327 5.778 7.33-.576L36.889 2.672l-9.08.715-7.3 28.967 7.33-.577zm2.611-11.38l2.34-10.249.221-.017 3.929 9.756-6.49.51z"
+		class="fill-white dark:fill-rich-purple-900 transition-colors"
+	/>
+</svg>
 
 <style lang="postcss">
-    .small {
-        @apply w-20 h-20 rounded-sm;
-    }
-
-    .letter-color {
-        @apply fill-rich-purple-500 dark:fill-rich-purple-300;
-    }
+	.small {
+		@apply w-20 h-20 rounded-sm;
+	}
 </style>
