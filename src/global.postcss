@@ -11,7 +11,7 @@ html {
 }
 
 .purple-text {
-    @apply text-rich-purple-500 dark:text-rich-purple-300;
+    @apply text-rich-purple-500 dark:text-rich-purple-300 transition-colors;
 }
 
 footer p a {
@@ -23,11 +23,21 @@ footer p a {
 }
 
 h1 {
-    @apply text-48 md:text-96 font-bold;
+    @apply text-48 md:text-96 font-bold transition-colors;
 }
 
 h2 {
-    @apply text-40 md:text-60 mt-48 sm:mt-0 mb-15 font-bold;
+    @apply text-40 md:text-60 mt-48 sm:mt-0 mb-15 font-bold transition-colors;
+}
+
+a.underline {
+    text-decoration-color: #322eff;
+    text-underline-offset: 0.1em;
+    text-decoration-thickness: 2px;
+}
+
+html.dark a.underline {
+    text-decoration-color: #7270ff;
 }
 
 @media (prefers-reduced-motion: no-preference) {

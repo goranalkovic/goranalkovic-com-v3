@@ -1,7 +1,7 @@
 const colors = require('tailwindcss/colors')
 
 const config = {
-    darkMode: 'media',
+    darkMode: 'class',
     mode: 'jit',
     purge: [
         './src/**/*.{html,js,svelte,ts,md,mdx}',
@@ -57,11 +57,13 @@ const config = {
             '0': '0',
             'px': '1px',
             '5': '0.3125rem',
+            '10': '0.625rem',
             '15': '0.9375rem',
             '20': '1.25rem',
             '25': '1.625rem',
             '30': '1.875rem',
             '36': '2.25rem',
+            '40': '2.5rem',
             '48': '3rem',
             '60': '3.75rem',
             '80': '5rem',
