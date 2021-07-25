@@ -146,6 +146,11 @@
 				buttonCaption="Explore my photos"
 				buttonUrl="https://unsplash.com/@goran_alkovic"
 			/>
+			<div class="grid grid-cols-3 gap-15 w-full max-w-xs mt-30">
+				<img class="rounded object-cover select-none" src="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-1_g3R9aJ96u.png?updatedAt=1627165984534" alt="My dog">
+				<img class="rounded object-cover select-none" src="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-2_gwmIcs_7yi.png?updatedAt=1627165984655" alt="Food on a table">
+				<img class="rounded object-cover select-none" src="https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-3_va-tBjnDmh.png?updatedAt=1627165984865" alt="Sunset at the Varaždin student dorm">
+			</div>
 		</div>
 	</div>
 </section>
