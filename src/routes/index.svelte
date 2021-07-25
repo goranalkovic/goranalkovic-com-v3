@@ -23,7 +23,12 @@
 		</span>
 	</h1>
 
-	<ArrowButton content="Learn more about me" url="#about" arrowDirection={ArrowDirections.DOWN} extraClass="mt-30 md:mt-60" />
+	<ArrowButton
+		content="Learn more about me"
+		url="#about"
+		arrowDirection={ArrowDirections.DOWN}
+		extraClass="mt-30 md:mt-60"
+	/>
 </section>
 
 <section
@@ -171,18 +176,6 @@
 		@apply pt-120 md:pt-180 pb-60 md:pb-60;
 	}
 	#about p {
-		@apply text-14 md:text-18;
-	}
-
-	a.underline {
-		text-decoration-color: #322eff;
-		text-underline-offset: 0.1em;
-		text-decoration-thickness: 2px;
-	}
-
-	@media (prefers-color-scheme: dark) {
-		a.underline {
-			text-decoration-color: #7270ff;
-		}
+		@apply text-14 md:text-18 transition-colors;
 	}
 </style>
