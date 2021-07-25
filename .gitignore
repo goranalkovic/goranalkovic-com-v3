@@ -2,7 +2,8 @@
 node_modules
 /.svelte-kit
 /package
-build/
+build
 
 # Local Netlify folder
 .netlify
+
