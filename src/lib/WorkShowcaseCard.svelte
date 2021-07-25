@@ -41,7 +41,7 @@
 		/>
 	</picture>
 	<h3
-		class="mt-15 lg:mt-0 mb-30 sm:mb-0 text-18 md:text-24 lg:text-48 font-medium lg:font-bold lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1 {dVer} {dHor} lg:p-20 transition-colors"
+		class="mt-15 lg:mt-0 mb-30 sm:mb-0 text-18 md:text-24 lg:text-40 font-medium lg:font-semibold lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1 {dVer} {dHor} lg:p-20 transition-colors"
 	>
 		{name}
 	</h3>
