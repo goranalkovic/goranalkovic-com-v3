@@ -1133,6 +1133,2169 @@ var require_cookie = __commonJS({
   }
 });
 
+// node_modules/svelte/internal/index.js
+var require_internal = __commonJS({
+  "node_modules/svelte/internal/index.js"(exports) {
+    init_shims();
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function noop3() {
+    }
+    var identity = (x) => x;
+    function assign(tar, src2) {
+      for (const k in src2)
+        tar[k] = src2[k];
+      return tar;
+    }
+    function is_promise(value) {
+      return value && typeof value === "object" && typeof value.then === "function";
+    }
+    function add_location(element2, file, line, column, char) {
+      element2.__svelte_meta = {
+        loc: { file, line, column, char }
+      };
+    }
+    function run2(fn) {
+      return fn();
+    }
+    function blank_object2() {
+      return Object.create(null);
+    }
+    function run_all2(fns) {
+      fns.forEach(run2);
+    }
+    function is_function(thing) {
+      return typeof thing === "function";
+    }
+    function safe_not_equal3(a, b) {
+      return a != a ? b == b : a !== b || (a && typeof a === "object" || typeof a === "function");
+    }
+    var src_url_equal_anchor;
+    function src_url_equal(element_src, url) {
+      if (!src_url_equal_anchor) {
+        src_url_equal_anchor = document.createElement("a");
+      }
+      src_url_equal_anchor.href = url;
+      return element_src === src_url_equal_anchor.href;
+    }
+    function not_equal(a, b) {
+      return a != a ? b == b : a !== b;
+    }
+    function is_empty(obj) {
+      return Object.keys(obj).length === 0;
+    }
+    function validate_store(store, name) {
+      if (store != null && typeof store.subscribe !== "function") {
+        throw new Error(`'${name}' is not a store with a 'subscribe' method`);
+      }
+    }
+    function subscribe2(store, ...callbacks) {
+      if (store == null) {
+        return noop3;
+      }
+      const unsub = store.subscribe(...callbacks);
+      return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+    }
+    function get_store_value(store) {
+      let value;
+      subscribe2(store, (_) => value = _)();
+      return value;
+    }
+    function component_subscribe(component, store, callback) {
+      component.$$.on_destroy.push(subscribe2(store, callback));
+    }
+    function create_slot(definition, ctx, $$scope, fn) {
+      if (definition) {
+        const slot_ctx = get_slot_context(definition, ctx, $$scope, fn);
+        return definition[0](slot_ctx);
+      }
+    }
+    function get_slot_context(definition, ctx, $$scope, fn) {
+      return definition[1] && fn ? assign($$scope.ctx.slice(), definition[1](fn(ctx))) : $$scope.ctx;
+    }
+    function get_slot_changes(definition, $$scope, dirty, fn) {
+      if (definition[2] && fn) {
+        const lets = definition[2](fn(dirty));
+        if ($$scope.dirty === void 0) {
+          return lets;
+        }
+        if (typeof lets === "object") {
+          const merged = [];
+          const len = Math.max($$scope.dirty.length, lets.length);
+          for (let i = 0; i < len; i += 1) {
+            merged[i] = $$scope.dirty[i] | lets[i];
+          }
+          return merged;
+        }
+        return $$scope.dirty | lets;
+      }
+      return $$scope.dirty;
+    }
+    function update_slot(slot, slot_definition, ctx, $$scope, dirty, get_slot_changes_fn, get_slot_context_fn) {
+      const slot_changes = get_slot_changes(slot_definition, $$scope, dirty, get_slot_changes_fn);
+      if (slot_changes) {
+        const slot_context = get_slot_context(slot_definition, ctx, $$scope, get_slot_context_fn);
+        slot.p(slot_context, slot_changes);
+      }
+    }
+    function update_slot_spread(slot, slot_definition, ctx, $$scope, dirty, get_slot_changes_fn, get_slot_spread_changes_fn, get_slot_context_fn) {
+      const slot_changes = get_slot_spread_changes_fn(dirty) | get_slot_changes(slot_definition, $$scope, dirty, get_slot_changes_fn);
+      if (slot_changes) {
+        const slot_context = get_slot_context(slot_definition, ctx, $$scope, get_slot_context_fn);
+        slot.p(slot_context, slot_changes);
+      }
+    }
+    function exclude_internal_props(props) {
+      const result = {};
+      for (const k in props)
+        if (k[0] !== "$")
+          result[k] = props[k];
+      return result;
+    }
+    function compute_rest_props(props, keys) {
+      const rest = {};
+      keys = new Set(keys);
+      for (const k in props)
+        if (!keys.has(k) && k[0] !== "$")
+          rest[k] = props[k];
+      return rest;
+    }
+    function compute_slots(slots) {
+      const result = {};
+      for (const key in slots) {
+        result[key] = true;
+      }
+      return result;
+    }
+    function once(fn) {
+      let ran = false;
+      return function(...args) {
+        if (ran)
+          return;
+        ran = true;
+        fn.call(this, ...args);
+      };
+    }
+    function null_to_empty(value) {
+      return value == null ? "" : value;
+    }
+    function set_store_value(store, ret, value = ret) {
+      store.set(value);
+      return ret;
+    }
+    var has_prop = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
+    function action_destroyer(action_result) {
+      return action_result && is_function(action_result.destroy) ? action_result.destroy : noop3;
+    }
+    var is_client = typeof window !== "undefined";
+    exports.now = is_client ? () => window.performance.now() : () => Date.now();
+    exports.raf = is_client ? (cb) => requestAnimationFrame(cb) : noop3;
+    function set_now(fn) {
+      exports.now = fn;
+    }
+    function set_raf(fn) {
+      exports.raf = fn;
+    }
+    var tasks = new Set();
+    function run_tasks(now) {
+      tasks.forEach((task) => {
+        if (!task.c(now)) {
+          tasks.delete(task);
+          task.f();
+        }
+      });
+      if (tasks.size !== 0)
+        exports.raf(run_tasks);
+    }
+    function clear_loops() {
+      tasks.clear();
+    }
+    function loop(callback) {
+      let task;
+      if (tasks.size === 0)
+        exports.raf(run_tasks);
+      return {
+        promise: new Promise((fulfill) => {
+          tasks.add(task = { c: callback, f: fulfill });
+        }),
+        abort() {
+          tasks.delete(task);
+        }
+      };
+    }
+    var is_hydrating = false;
+    function start_hydrating() {
+      is_hydrating = true;
+    }
+    function end_hydrating() {
+      is_hydrating = false;
+    }
+    function upper_bound(low, high, key, value) {
+      while (low < high) {
+        const mid = low + (high - low >> 1);
+        if (key(mid) <= value) {
+          low = mid + 1;
+        } else {
+          high = mid;
+        }
+      }
+      return low;
+    }
+    function init_hydrate(target) {
+      if (target.hydrate_init)
+        return;
+      target.hydrate_init = true;
+      let children2 = target.childNodes;
+      if (target.nodeName === "HEAD") {
+        const myChildren = [];
+        for (let i = 0; i < children2.length; i++) {
+          const node = children2[i];
+          if (node.claim_order !== void 0) {
+            myChildren.push(node);
+          }
+        }
+        children2 = myChildren;
+      }
+      const m = new Int32Array(children2.length + 1);
+      const p = new Int32Array(children2.length);
+      m[0] = -1;
+      let longest = 0;
+      for (let i = 0; i < children2.length; i++) {
+        const current = children2[i].claim_order;
+        const seqLen = (longest > 0 && children2[m[longest]].claim_order <= current ? longest + 1 : upper_bound(1, longest, (idx) => children2[m[idx]].claim_order, current)) - 1;
+        p[i] = m[seqLen] + 1;
+        const newLen = seqLen + 1;
+        m[newLen] = i;
+        longest = Math.max(newLen, longest);
+      }
+      const lis = [];
+      const toMove = [];
+      let last = children2.length - 1;
+      for (let cur = m[longest] + 1; cur != 0; cur = p[cur - 1]) {
+        lis.push(children2[cur - 1]);
+        for (; last >= cur; last--) {
+          toMove.push(children2[last]);
+        }
+        last--;
+      }
+      for (; last >= 0; last--) {
+        toMove.push(children2[last]);
+      }
+      lis.reverse();
+      toMove.sort((a, b) => a.claim_order - b.claim_order);
+      for (let i = 0, j = 0; i < toMove.length; i++) {
+        while (j < lis.length && toMove[i].claim_order >= lis[j].claim_order) {
+          j++;
+        }
+        const anchor = j < lis.length ? lis[j] : null;
+        target.insertBefore(toMove[i], anchor);
+      }
+    }
+    function append(target, node) {
+      target.appendChild(node);
+    }
+    function append_styles(target, style_sheet_id, styles) {
+      var _a;
+      const append_styles_to = get_root_for_styles(target);
+      if (!((_a = append_styles_to) === null || _a === void 0 ? void 0 : _a.getElementById(style_sheet_id))) {
+        const style = element("style");
+        style.id = style_sheet_id;
+        style.textContent = styles;
+        append_stylesheet(append_styles_to, style);
+      }
+    }
+    function get_root_for_node(node) {
+      if (!node)
+        return document;
+      return node.getRootNode ? node.getRootNode() : node.ownerDocument;
+    }
+    function get_root_for_styles(node) {
+      const root = get_root_for_node(node);
+      return root.host ? root : root;
+    }
+    function append_empty_stylesheet(node) {
+      const style_element = element("style");
+      append_stylesheet(get_root_for_styles(node), style_element);
+      return style_element;
+    }
+    function append_stylesheet(node, style) {
+      append(node.head || node, style);
+    }
+    function append_hydration(target, node) {
+      if (is_hydrating) {
+        init_hydrate(target);
+        if (target.actual_end_child === void 0 || target.actual_end_child !== null && target.actual_end_child.parentElement !== target) {
+          target.actual_end_child = target.firstChild;
+        }
+        while (target.actual_end_child !== null && target.actual_end_child.claim_order === void 0) {
+          target.actual_end_child = target.actual_end_child.nextSibling;
+        }
+        if (node !== target.actual_end_child) {
+          if (node.claim_order !== void 0 || node.parentNode !== target) {
+            target.insertBefore(node, target.actual_end_child);
+          }
+        } else {
+          target.actual_end_child = node.nextSibling;
+        }
+      } else if (node.parentNode !== target) {
+        target.appendChild(node);
+      }
+    }
+    function insert(target, node, anchor) {
+      target.insertBefore(node, anchor || null);
+    }
+    function insert_hydration(target, node, anchor) {
+      if (is_hydrating && !anchor) {
+        append_hydration(target, node);
+      } else if (node.parentNode !== target || node.nextSibling != anchor) {
+        target.insertBefore(node, anchor || null);
+      }
+    }
+    function detach(node) {
+      node.parentNode.removeChild(node);
+    }
+    function destroy_each(iterations, detaching) {
+      for (let i = 0; i < iterations.length; i += 1) {
+        if (iterations[i])
+          iterations[i].d(detaching);
+      }
+    }
+    function element(name) {
+      return document.createElement(name);
+    }
+    function element_is(name, is) {
+      return document.createElement(name, { is });
+    }
+    function object_without_properties(obj, exclude) {
+      const target = {};
+      for (const k in obj) {
+        if (has_prop(obj, k) && exclude.indexOf(k) === -1) {
+          target[k] = obj[k];
+        }
+      }
+      return target;
+    }
+    function svg_element(name) {
+      return document.createElementNS("http://www.w3.org/2000/svg", name);
+    }
+    function text(data) {
+      return document.createTextNode(data);
+    }
+    function space() {
+      return text(" ");
+    }
+    function empty2() {
+      return text("");
+    }
+    function listen(node, event, handler2, options2) {
+      node.addEventListener(event, handler2, options2);
+      return () => node.removeEventListener(event, handler2, options2);
+    }
+    function prevent_default(fn) {
+      return function(event) {
+        event.preventDefault();
+        return fn.call(this, event);
+      };
+    }
+    function stop_propagation(fn) {
+      return function(event) {
+        event.stopPropagation();
+        return fn.call(this, event);
+      };
+    }
+    function self(fn) {
+      return function(event) {
+        if (event.target === this)
+          fn.call(this, event);
+      };
+    }
+    function trusted(fn) {
+      return function(event) {
+        if (event.isTrusted)
+          fn.call(this, event);
+      };
+    }
+    function attr(node, attribute, value) {
+      if (value == null)
+        node.removeAttribute(attribute);
+      else if (node.getAttribute(attribute) !== value)
+        node.setAttribute(attribute, value);
+    }
+    function set_attributes(node, attributes) {
+      const descriptors = Object.getOwnPropertyDescriptors(node.__proto__);
+      for (const key in attributes) {
+        if (attributes[key] == null) {
+          node.removeAttribute(key);
+        } else if (key === "style") {
+          node.style.cssText = attributes[key];
+        } else if (key === "__value") {
+          node.value = node[key] = attributes[key];
+        } else if (descriptors[key] && descriptors[key].set) {
+          node[key] = attributes[key];
+        } else {
+          attr(node, key, attributes[key]);
+        }
+      }
+    }
+    function set_svg_attributes(node, attributes) {
+      for (const key in attributes) {
+        attr(node, key, attributes[key]);
+      }
+    }
+    function set_custom_element_data(node, prop, value) {
+      if (prop in node) {
+        node[prop] = typeof node[prop] === "boolean" && value === "" ? true : value;
+      } else {
+        attr(node, prop, value);
+      }
+    }
+    function xlink_attr(node, attribute, value) {
+      node.setAttributeNS("http://www.w3.org/1999/xlink", attribute, value);
+    }
+    function get_binding_group_value(group, __value, checked) {
+      const value = new Set();
+      for (let i = 0; i < group.length; i += 1) {
+        if (group[i].checked)
+          value.add(group[i].__value);
+      }
+      if (!checked) {
+        value.delete(__value);
+      }
+      return Array.from(value);
+    }
+    function to_number(value) {
+      return value === "" ? null : +value;
+    }
+    function time_ranges_to_array(ranges) {
+      const array = [];
+      for (let i = 0; i < ranges.length; i += 1) {
+        array.push({ start: ranges.start(i), end: ranges.end(i) });
+      }
+      return array;
+    }
+    function children(element2) {
+      return Array.from(element2.childNodes);
+    }
+    function init_claim_info(nodes) {
+      if (nodes.claim_info === void 0) {
+        nodes.claim_info = { last_index: 0, total_claimed: 0 };
+      }
+    }
+    function claim_node(nodes, predicate, processNode, createNode, dontUpdateLastIndex = false) {
+      init_claim_info(nodes);
+      const resultNode = (() => {
+        for (let i = nodes.claim_info.last_index; i < nodes.length; i++) {
+          const node = nodes[i];
+          if (predicate(node)) {
+            const replacement = processNode(node);
+            if (replacement === void 0) {
+              nodes.splice(i, 1);
+            } else {
+              nodes[i] = replacement;
+            }
+            if (!dontUpdateLastIndex) {
+              nodes.claim_info.last_index = i;
+            }
+            return node;
+          }
+        }
+        for (let i = nodes.claim_info.last_index - 1; i >= 0; i--) {
+          const node = nodes[i];
+          if (predicate(node)) {
+            const replacement = processNode(node);
+            if (replacement === void 0) {
+              nodes.splice(i, 1);
+            } else {
+              nodes[i] = replacement;
+            }
+            if (!dontUpdateLastIndex) {
+              nodes.claim_info.last_index = i;
+            } else if (replacement === void 0) {
+              nodes.claim_info.last_index--;
+            }
+            return node;
+          }
+        }
+        return createNode();
+      })();
+      resultNode.claim_order = nodes.claim_info.total_claimed;
+      nodes.claim_info.total_claimed += 1;
+      return resultNode;
+    }
+    function claim_element(nodes, name, attributes, svg) {
+      return claim_node(nodes, (node) => node.nodeName === name, (node) => {
+        const remove = [];
+        for (let j = 0; j < node.attributes.length; j++) {
+          const attribute = node.attributes[j];
+          if (!attributes[attribute.name]) {
+            remove.push(attribute.name);
+          }
+        }
+        remove.forEach((v) => node.removeAttribute(v));
+        return void 0;
+      }, () => svg ? svg_element(name) : element(name));
+    }
+    function claim_text(nodes, data) {
+      return claim_node(nodes, (node) => node.nodeType === 3, (node) => {
+        const dataStr = "" + data;
+        if (node.data.startsWith(dataStr)) {
+          if (node.data.length !== dataStr.length) {
+            return node.splitText(dataStr.length);
+          }
+        } else {
+          node.data = dataStr;
+        }
+      }, () => text(data), true);
+    }
+    function claim_space(nodes) {
+      return claim_text(nodes, " ");
+    }
+    function find_comment(nodes, text2, start) {
+      for (let i = start; i < nodes.length; i += 1) {
+        const node = nodes[i];
+        if (node.nodeType === 8 && node.textContent.trim() === text2) {
+          return i;
+        }
+      }
+      return nodes.length;
+    }
+    function claim_html_tag(nodes) {
+      const start_index = find_comment(nodes, "HTML_TAG_START", 0);
+      const end_index = find_comment(nodes, "HTML_TAG_END", start_index);
+      if (start_index === end_index) {
+        return new HtmlTagHydration();
+      }
+      init_claim_info(nodes);
+      const html_tag_nodes = nodes.splice(start_index, end_index + 1);
+      detach(html_tag_nodes[0]);
+      detach(html_tag_nodes[html_tag_nodes.length - 1]);
+      const claimed_nodes = html_tag_nodes.slice(1, html_tag_nodes.length - 1);
+      for (const n of claimed_nodes) {
+        n.claim_order = nodes.claim_info.total_claimed;
+        nodes.claim_info.total_claimed += 1;
+      }
+      return new HtmlTagHydration(claimed_nodes);
+    }
+    function set_data(text2, data) {
+      data = "" + data;
+      if (text2.wholeText !== data)
+        text2.data = data;
+    }
+    function set_input_value(input, value) {
+      input.value = value == null ? "" : value;
+    }
+    function set_input_type(input, type) {
+      try {
+        input.type = type;
+      } catch (e) {
+      }
+    }
+    function set_style(node, key, value, important) {
+      node.style.setProperty(key, value, important ? "important" : "");
+    }
+    function select_option(select, value) {
+      for (let i = 0; i < select.options.length; i += 1) {
+        const option = select.options[i];
+        if (option.__value === value) {
+          option.selected = true;
+          return;
+        }
+      }
+    }
+    function select_options(select, value) {
+      for (let i = 0; i < select.options.length; i += 1) {
+        const option = select.options[i];
+        option.selected = ~value.indexOf(option.__value);
+      }
+    }
+    function select_value(select) {
+      const selected_option = select.querySelector(":checked") || select.options[0];
+      return selected_option && selected_option.__value;
+    }
+    function select_multiple_value(select) {
+      return [].map.call(select.querySelectorAll(":checked"), (option) => option.__value);
+    }
+    var crossorigin;
+    function is_crossorigin() {
+      if (crossorigin === void 0) {
+        crossorigin = false;
+        try {
+          if (typeof window !== "undefined" && window.parent) {
+            void window.parent.document;
+          }
+        } catch (error3) {
+          crossorigin = true;
+        }
+      }
+      return crossorigin;
+    }
+    function add_resize_listener(node, fn) {
+      const computed_style = getComputedStyle(node);
+      if (computed_style.position === "static") {
+        node.style.position = "relative";
+      }
+      const iframe = element("iframe");
+      iframe.setAttribute("style", "display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; border: 0; opacity: 0; pointer-events: none; z-index: -1;");
+      iframe.setAttribute("aria-hidden", "true");
+      iframe.tabIndex = -1;
+      const crossorigin2 = is_crossorigin();
+      let unsubscribe;
+      if (crossorigin2) {
+        iframe.src = "data:text/html,<script>onresize=function(){parent.postMessage(0,'*')}<\/script>";
+        unsubscribe = listen(window, "message", (event) => {
+          if (event.source === iframe.contentWindow)
+            fn();
+        });
+      } else {
+        iframe.src = "about:blank";
+        iframe.onload = () => {
+          unsubscribe = listen(iframe.contentWindow, "resize", fn);
+        };
+      }
+      append(node, iframe);
+      return () => {
+        if (crossorigin2) {
+          unsubscribe();
+        } else if (unsubscribe && iframe.contentWindow) {
+          unsubscribe();
+        }
+        detach(iframe);
+      };
+    }
+    function toggle_class(element2, name, toggle) {
+      element2.classList[toggle ? "add" : "remove"](name);
+    }
+    function custom_event(type, detail, bubbles = false) {
+      const e = document.createEvent("CustomEvent");
+      e.initCustomEvent(type, bubbles, false, detail);
+      return e;
+    }
+    function query_selector_all(selector, parent = document.body) {
+      return Array.from(parent.querySelectorAll(selector));
+    }
+    var HtmlTag = class {
+      constructor() {
+        this.e = this.n = null;
+      }
+      c(html) {
+        this.h(html);
+      }
+      m(html, target, anchor = null) {
+        if (!this.e) {
+          this.e = element(target.nodeName);
+          this.t = target;
+          this.c(html);
+        }
+        this.i(anchor);
+      }
+      h(html) {
+        this.e.innerHTML = html;
+        this.n = Array.from(this.e.childNodes);
+      }
+      i(anchor) {
+        for (let i = 0; i < this.n.length; i += 1) {
+          insert(this.t, this.n[i], anchor);
+        }
+      }
+      p(html) {
+        this.d();
+        this.h(html);
+        this.i(this.a);
+      }
+      d() {
+        this.n.forEach(detach);
+      }
+    };
+    var HtmlTagHydration = class extends HtmlTag {
+      constructor(claimed_nodes) {
+        super();
+        this.e = this.n = null;
+        this.l = claimed_nodes;
+      }
+      c(html) {
+        if (this.l) {
+          this.n = this.l;
+        } else {
+          super.c(html);
+        }
+      }
+      i(anchor) {
+        for (let i = 0; i < this.n.length; i += 1) {
+          insert_hydration(this.t, this.n[i], anchor);
+        }
+      }
+    };
+    function attribute_to_object(attributes) {
+      const result = {};
+      for (const attribute of attributes) {
+        result[attribute.name] = attribute.value;
+      }
+      return result;
+    }
+    function get_custom_elements_slots(element2) {
+      const result = {};
+      element2.childNodes.forEach((node) => {
+        result[node.slot || "default"] = true;
+      });
+      return result;
+    }
+    var active_docs = new Set();
+    var active = 0;
+    function hash2(str) {
+      let hash3 = 5381;
+      let i = str.length;
+      while (i--)
+        hash3 = (hash3 << 5) - hash3 ^ str.charCodeAt(i);
+      return hash3 >>> 0;
+    }
+    function create_rule(node, a, b, duration, delay, ease, fn, uid = 0) {
+      const step = 16.666 / duration;
+      let keyframes = "{\n";
+      for (let p = 0; p <= 1; p += step) {
+        const t = a + (b - a) * ease(p);
+        keyframes += p * 100 + `%{${fn(t, 1 - t)}}
+`;
+      }
+      const rule = keyframes + `100% {${fn(b, 1 - b)}}
+}`;
+      const name = `__svelte_${hash2(rule)}_${uid}`;
+      const doc = get_root_for_node(node);
+      active_docs.add(doc);
+      const stylesheet = doc.__svelte_stylesheet || (doc.__svelte_stylesheet = append_empty_stylesheet(node).sheet);
+      const current_rules = doc.__svelte_rules || (doc.__svelte_rules = {});
+      if (!current_rules[name]) {
+        current_rules[name] = true;
+        stylesheet.insertRule(`@keyframes ${name} ${rule}`, stylesheet.cssRules.length);
+      }
+      const animation = node.style.animation || "";
+      node.style.animation = `${animation ? `${animation}, ` : ""}${name} ${duration}ms linear ${delay}ms 1 both`;
+      active += 1;
+      return name;
+    }
+    function delete_rule(node, name) {
+      const previous = (node.style.animation || "").split(", ");
+      const next = previous.filter(name ? (anim) => anim.indexOf(name) < 0 : (anim) => anim.indexOf("__svelte") === -1);
+      const deleted = previous.length - next.length;
+      if (deleted) {
+        node.style.animation = next.join(", ");
+        active -= deleted;
+        if (!active)
+          clear_rules();
+      }
+    }
+    function clear_rules() {
+      exports.raf(() => {
+        if (active)
+          return;
+        active_docs.forEach((doc) => {
+          const stylesheet = doc.__svelte_stylesheet;
+          let i = stylesheet.cssRules.length;
+          while (i--)
+            stylesheet.deleteRule(i);
+          doc.__svelte_rules = {};
+        });
+        active_docs.clear();
+      });
+    }
+    function create_animation(node, from, fn, params) {
+      if (!from)
+        return noop3;
+      const to = node.getBoundingClientRect();
+      if (from.left === to.left && from.right === to.right && from.top === to.top && from.bottom === to.bottom)
+        return noop3;
+      const {
+        delay = 0,
+        duration = 300,
+        easing = identity,
+        start: start_time = exports.now() + delay,
+        end = start_time + duration,
+        tick: tick2 = noop3,
+        css: css2
+      } = fn(node, { from, to }, params);
+      let running = true;
+      let started = false;
+      let name;
+      function start() {
+        if (css2) {
+          name = create_rule(node, 0, 1, duration, delay, easing, css2);
+        }
+        if (!delay) {
+          started = true;
+        }
+      }
+      function stop() {
+        if (css2)
+          delete_rule(node, name);
+        running = false;
+      }
+      loop((now) => {
+        if (!started && now >= start_time) {
+          started = true;
+        }
+        if (started && now >= end) {
+          tick2(1, 0);
+          stop();
+        }
+        if (!running) {
+          return false;
+        }
+        if (started) {
+          const p = now - start_time;
+          const t = 0 + 1 * easing(p / duration);
+          tick2(t, 1 - t);
+        }
+        return true;
+      });
+      start();
+      tick2(0, 1);
+      return stop;
+    }
+    function fix_position(node) {
+      const style = getComputedStyle(node);
+      if (style.position !== "absolute" && style.position !== "fixed") {
+        const { width, height } = style;
+        const a = node.getBoundingClientRect();
+        node.style.position = "absolute";
+        node.style.width = width;
+        node.style.height = height;
+        add_transform(node, a);
+      }
+    }
+    function add_transform(node, a) {
+      const b = node.getBoundingClientRect();
+      if (a.left !== b.left || a.top !== b.top) {
+        const style = getComputedStyle(node);
+        const transform = style.transform === "none" ? "" : style.transform;
+        node.style.transform = `${transform} translate(${a.left - b.left}px, ${a.top - b.top}px)`;
+      }
+    }
+    function set_current_component2(component) {
+      exports.current_component = component;
+    }
+    function get_current_component2() {
+      if (!exports.current_component)
+        throw new Error("Function called outside component initialization");
+      return exports.current_component;
+    }
+    function beforeUpdate(fn) {
+      get_current_component2().$$.before_update.push(fn);
+    }
+    function onMount(fn) {
+      get_current_component2().$$.on_mount.push(fn);
+    }
+    function afterUpdate2(fn) {
+      get_current_component2().$$.after_update.push(fn);
+    }
+    function onDestroy(fn) {
+      get_current_component2().$$.on_destroy.push(fn);
+    }
+    function createEventDispatcher() {
+      const component = get_current_component2();
+      return (type, detail) => {
+        const callbacks = component.$$.callbacks[type];
+        if (callbacks) {
+          const event = custom_event(type, detail);
+          callbacks.slice().forEach((fn) => {
+            fn.call(component, event);
+          });
+        }
+      };
+    }
+    function setContext2(key, context) {
+      get_current_component2().$$.context.set(key, context);
+    }
+    function getContext2(key) {
+      return get_current_component2().$$.context.get(key);
+    }
+    function getAllContexts() {
+      return get_current_component2().$$.context;
+    }
+    function hasContext(key) {
+      return get_current_component2().$$.context.has(key);
+    }
+    function bubble(component, event) {
+      const callbacks = component.$$.callbacks[event.type];
+      if (callbacks) {
+        callbacks.slice().forEach((fn) => fn.call(this, event));
+      }
+    }
+    var dirty_components = [];
+    var intros = { enabled: false };
+    var binding_callbacks = [];
+    var render_callbacks = [];
+    var flush_callbacks = [];
+    var resolved_promise = Promise.resolve();
+    var update_scheduled = false;
+    function schedule_update() {
+      if (!update_scheduled) {
+        update_scheduled = true;
+        resolved_promise.then(flush);
+      }
+    }
+    function tick() {
+      schedule_update();
+      return resolved_promise;
+    }
+    function add_render_callback(fn) {
+      render_callbacks.push(fn);
+    }
+    function add_flush_callback(fn) {
+      flush_callbacks.push(fn);
+    }
+    var flushing = false;
+    var seen_callbacks = new Set();
+    function flush() {
+      if (flushing)
+        return;
+      flushing = true;
+      do {
+        for (let i = 0; i < dirty_components.length; i += 1) {
+          const component = dirty_components[i];
+          set_current_component2(component);
+          update(component.$$);
+        }
+        set_current_component2(null);
+        dirty_components.length = 0;
+        while (binding_callbacks.length)
+          binding_callbacks.pop()();
+        for (let i = 0; i < render_callbacks.length; i += 1) {
+          const callback = render_callbacks[i];
+          if (!seen_callbacks.has(callback)) {
+            seen_callbacks.add(callback);
+            callback();
+          }
+        }
+        render_callbacks.length = 0;
+      } while (dirty_components.length);
+      while (flush_callbacks.length) {
+        flush_callbacks.pop()();
+      }
+      update_scheduled = false;
+      flushing = false;
+      seen_callbacks.clear();
+    }
+    function update($$) {
+      if ($$.fragment !== null) {
+        $$.update();
+        run_all2($$.before_update);
+        const dirty = $$.dirty;
+        $$.dirty = [-1];
+        $$.fragment && $$.fragment.p($$.ctx, dirty);
+        $$.after_update.forEach(add_render_callback);
+      }
+    }
+    var promise;
+    function wait() {
+      if (!promise) {
+        promise = Promise.resolve();
+        promise.then(() => {
+          promise = null;
+        });
+      }
+      return promise;
+    }
+    function dispatch(node, direction, kind) {
+      node.dispatchEvent(custom_event(`${direction ? "intro" : "outro"}${kind}`));
+    }
+    var outroing = new Set();
+    var outros;
+    function group_outros() {
+      outros = {
+        r: 0,
+        c: [],
+        p: outros
+      };
+    }
+    function check_outros() {
+      if (!outros.r) {
+        run_all2(outros.c);
+      }
+      outros = outros.p;
+    }
+    function transition_in(block, local) {
+      if (block && block.i) {
+        outroing.delete(block);
+        block.i(local);
+      }
+    }
+    function transition_out(block, local, detach2, callback) {
+      if (block && block.o) {
+        if (outroing.has(block))
+          return;
+        outroing.add(block);
+        outros.c.push(() => {
+          outroing.delete(block);
+          if (callback) {
+            if (detach2)
+              block.d(1);
+            callback();
+          }
+        });
+        block.o(local);
+      }
+    }
+    var null_transition = { duration: 0 };
+    function create_in_transition(node, fn, params) {
+      let config = fn(node, params);
+      let running = false;
+      let animation_name;
+      let task;
+      let uid = 0;
+      function cleanup() {
+        if (animation_name)
+          delete_rule(node, animation_name);
+      }
+      function go() {
+        const { delay = 0, duration = 300, easing = identity, tick: tick2 = noop3, css: css2 } = config || null_transition;
+        if (css2)
+          animation_name = create_rule(node, 0, 1, duration, delay, easing, css2, uid++);
+        tick2(0, 1);
+        const start_time = exports.now() + delay;
+        const end_time = start_time + duration;
+        if (task)
+          task.abort();
+        running = true;
+        add_render_callback(() => dispatch(node, true, "start"));
+        task = loop((now) => {
+          if (running) {
+            if (now >= end_time) {
+              tick2(1, 0);
+              dispatch(node, true, "end");
+              cleanup();
+              return running = false;
+            }
+            if (now >= start_time) {
+              const t = easing((now - start_time) / duration);
+              tick2(t, 1 - t);
+            }
+          }
+          return running;
+        });
+      }
+      let started = false;
+      return {
+        start() {
+          if (started)
+            return;
+          started = true;
+          delete_rule(node);
+          if (is_function(config)) {
+            config = config();
+            wait().then(go);
+          } else {
+            go();
+          }
+        },
+        invalidate() {
+          started = false;
+        },
+        end() {
+          if (running) {
+            cleanup();
+            running = false;
+          }
+        }
+      };
+    }
+    function create_out_transition(node, fn, params) {
+      let config = fn(node, params);
+      let running = true;
+      let animation_name;
+      const group = outros;
+      group.r += 1;
+      function go() {
+        const { delay = 0, duration = 300, easing = identity, tick: tick2 = noop3, css: css2 } = config || null_transition;
+        if (css2)
+          animation_name = create_rule(node, 1, 0, duration, delay, easing, css2);
+        const start_time = exports.now() + delay;
+        const end_time = start_time + duration;
+        add_render_callback(() => dispatch(node, false, "start"));
+        loop((now) => {
+          if (running) {
+            if (now >= end_time) {
+              tick2(0, 1);
+              dispatch(node, false, "end");
+              if (!--group.r) {
+                run_all2(group.c);
+              }
+              return false;
+            }
+            if (now >= start_time) {
+              const t = easing((now - start_time) / duration);
+              tick2(1 - t, t);
+            }
+          }
+          return running;
+        });
+      }
+      if (is_function(config)) {
+        wait().then(() => {
+          config = config();
+          go();
+        });
+      } else {
+        go();
+      }
+      return {
+        end(reset) {
+          if (reset && config.tick) {
+            config.tick(1, 0);
+          }
+          if (running) {
+            if (animation_name)
+              delete_rule(node, animation_name);
+            running = false;
+          }
+        }
+      };
+    }
+    function create_bidirectional_transition(node, fn, params, intro) {
+      let config = fn(node, params);
+      let t = intro ? 0 : 1;
+      let running_program = null;
+      let pending_program = null;
+      let animation_name = null;
+      function clear_animation() {
+        if (animation_name)
+          delete_rule(node, animation_name);
+      }
+      function init3(program, duration) {
+        const d = program.b - t;
+        duration *= Math.abs(d);
+        return {
+          a: t,
+          b: program.b,
+          d,
+          duration,
+          start: program.start,
+          end: program.start + duration,
+          group: program.group
+        };
+      }
+      function go(b) {
+        const { delay = 0, duration = 300, easing = identity, tick: tick2 = noop3, css: css2 } = config || null_transition;
+        const program = {
+          start: exports.now() + delay,
+          b
+        };
+        if (!b) {
+          program.group = outros;
+          outros.r += 1;
+        }
+        if (running_program || pending_program) {
+          pending_program = program;
+        } else {
+          if (css2) {
+            clear_animation();
+            animation_name = create_rule(node, t, b, duration, delay, easing, css2);
+          }
+          if (b)
+            tick2(0, 1);
+          running_program = init3(program, duration);
+          add_render_callback(() => dispatch(node, b, "start"));
+          loop((now) => {
+            if (pending_program && now > pending_program.start) {
+              running_program = init3(pending_program, duration);
+              pending_program = null;
+              dispatch(node, running_program.b, "start");
+              if (css2) {
+                clear_animation();
+                animation_name = create_rule(node, t, running_program.b, running_program.duration, 0, easing, config.css);
+              }
+            }
+            if (running_program) {
+              if (now >= running_program.end) {
+                tick2(t = running_program.b, 1 - t);
+                dispatch(node, running_program.b, "end");
+                if (!pending_program) {
+                  if (running_program.b) {
+                    clear_animation();
+                  } else {
+                    if (!--running_program.group.r)
+                      run_all2(running_program.group.c);
+                  }
+                }
+                running_program = null;
+              } else if (now >= running_program.start) {
+                const p = now - running_program.start;
+                t = running_program.a + running_program.d * easing(p / running_program.duration);
+                tick2(t, 1 - t);
+              }
+            }
+            return !!(running_program || pending_program);
+          });
+        }
+      }
+      return {
+        run(b) {
+          if (is_function(config)) {
+            wait().then(() => {
+              config = config();
+              go(b);
+            });
+          } else {
+            go(b);
+          }
+        },
+        end() {
+          clear_animation();
+          running_program = pending_program = null;
+        }
+      };
+    }
+    function handle_promise(promise2, info) {
+      const token = info.token = {};
+      function update2(type, index2, key, value) {
+        if (info.token !== token)
+          return;
+        info.resolved = value;
+        let child_ctx = info.ctx;
+        if (key !== void 0) {
+          child_ctx = child_ctx.slice();
+          child_ctx[key] = value;
+        }
+        const block = type && (info.current = type)(child_ctx);
+        let needs_flush = false;
+        if (info.block) {
+          if (info.blocks) {
+            info.blocks.forEach((block2, i) => {
+              if (i !== index2 && block2) {
+                group_outros();
+                transition_out(block2, 1, 1, () => {
+                  if (info.blocks[i] === block2) {
+                    info.blocks[i] = null;
+                  }
+                });
+                check_outros();
+              }
+            });
+          } else {
+            info.block.d(1);
+          }
+          block.c();
+          transition_in(block, 1);
+          block.m(info.mount(), info.anchor);
+          needs_flush = true;
+        }
+        info.block = block;
+        if (info.blocks)
+          info.blocks[index2] = block;
+        if (needs_flush) {
+          flush();
+        }
+      }
+      if (is_promise(promise2)) {
+        const current_component2 = get_current_component2();
+        promise2.then((value) => {
+          set_current_component2(current_component2);
+          update2(info.then, 1, info.value, value);
+          set_current_component2(null);
+        }, (error3) => {
+          set_current_component2(current_component2);
+          update2(info.catch, 2, info.error, error3);
+          set_current_component2(null);
+          if (!info.hasCatch) {
+            throw error3;
+          }
+        });
+        if (info.current !== info.pending) {
+          update2(info.pending, 0);
+          return true;
+        }
+      } else {
+        if (info.current !== info.then) {
+          update2(info.then, 1, info.value, promise2);
+          return true;
+        }
+        info.resolved = promise2;
+      }
+    }
+    function update_await_block_branch(info, ctx, dirty) {
+      const child_ctx = ctx.slice();
+      const { resolved } = info;
+      if (info.current === info.then) {
+        child_ctx[info.value] = resolved;
+      }
+      if (info.current === info.catch) {
+        child_ctx[info.error] = resolved;
+      }
+      info.block.p(child_ctx, dirty);
+    }
+    var globals = typeof window !== "undefined" ? window : typeof globalThis !== "undefined" ? globalThis : global;
+    function destroy_block(block, lookup) {
+      block.d(1);
+      lookup.delete(block.key);
+    }
+    function outro_and_destroy_block(block, lookup) {
+      transition_out(block, 1, 1, () => {
+        lookup.delete(block.key);
+      });
+    }
+    function fix_and_destroy_block(block, lookup) {
+      block.f();
+      destroy_block(block, lookup);
+    }
+    function fix_and_outro_and_destroy_block(block, lookup) {
+      block.f();
+      outro_and_destroy_block(block, lookup);
+    }
+    function update_keyed_each(old_blocks, dirty, get_key, dynamic, ctx, list, lookup, node, destroy, create_each_block, next, get_context) {
+      let o = old_blocks.length;
+      let n = list.length;
+      let i = o;
+      const old_indexes = {};
+      while (i--)
+        old_indexes[old_blocks[i].key] = i;
+      const new_blocks = [];
+      const new_lookup = new Map();
+      const deltas = new Map();
+      i = n;
+      while (i--) {
+        const child_ctx = get_context(ctx, list, i);
+        const key = get_key(child_ctx);
+        let block = lookup.get(key);
+        if (!block) {
+          block = create_each_block(key, child_ctx);
+          block.c();
+        } else if (dynamic) {
+          block.p(child_ctx, dirty);
+        }
+        new_lookup.set(key, new_blocks[i] = block);
+        if (key in old_indexes)
+          deltas.set(key, Math.abs(i - old_indexes[key]));
+      }
+      const will_move = new Set();
+      const did_move = new Set();
+      function insert2(block) {
+        transition_in(block, 1);
+        block.m(node, next);
+        lookup.set(block.key, block);
+        next = block.first;
+        n--;
+      }
+      while (o && n) {
+        const new_block = new_blocks[n - 1];
+        const old_block = old_blocks[o - 1];
+        const new_key = new_block.key;
+        const old_key = old_block.key;
+        if (new_block === old_block) {
+          next = new_block.first;
+          o--;
+          n--;
+        } else if (!new_lookup.has(old_key)) {
+          destroy(old_block, lookup);
+          o--;
+        } else if (!lookup.has(new_key) || will_move.has(new_key)) {
+          insert2(new_block);
+        } else if (did_move.has(old_key)) {
+          o--;
+        } else if (deltas.get(new_key) > deltas.get(old_key)) {
+          did_move.add(new_key);
+          insert2(new_block);
+        } else {
+          will_move.add(old_key);
+          o--;
+        }
+      }
+      while (o--) {
+        const old_block = old_blocks[o];
+        if (!new_lookup.has(old_block.key))
+          destroy(old_block, lookup);
+      }
+      while (n)
+        insert2(new_blocks[n - 1]);
+      return new_blocks;
+    }
+    function validate_each_keys(ctx, list, get_context, get_key) {
+      const keys = new Set();
+      for (let i = 0; i < list.length; i++) {
+        const key = get_key(get_context(ctx, list, i));
+        if (keys.has(key)) {
+          throw new Error("Cannot have duplicate keys in a keyed each");
+        }
+        keys.add(key);
+      }
+    }
+    function get_spread_update(levels, updates) {
+      const update2 = {};
+      const to_null_out = {};
+      const accounted_for = { $$scope: 1 };
+      let i = levels.length;
+      while (i--) {
+        const o = levels[i];
+        const n = updates[i];
+        if (n) {
+          for (const key in o) {
+            if (!(key in n))
+              to_null_out[key] = 1;
+          }
+          for (const key in n) {
+            if (!accounted_for[key]) {
+              update2[key] = n[key];
+              accounted_for[key] = 1;
+            }
+          }
+          levels[i] = n;
+        } else {
+          for (const key in o) {
+            accounted_for[key] = 1;
+          }
+        }
+      }
+      for (const key in to_null_out) {
+        if (!(key in update2))
+          update2[key] = void 0;
+      }
+      return update2;
+    }
+    function get_spread_object(spread_props) {
+      return typeof spread_props === "object" && spread_props !== null ? spread_props : {};
+    }
+    var boolean_attributes = new Set([
+      "allowfullscreen",
+      "allowpaymentrequest",
+      "async",
+      "autofocus",
+      "autoplay",
+      "checked",
+      "controls",
+      "default",
+      "defer",
+      "disabled",
+      "formnovalidate",
+      "hidden",
+      "ismap",
+      "loop",
+      "multiple",
+      "muted",
+      "nomodule",
+      "novalidate",
+      "open",
+      "playsinline",
+      "readonly",
+      "required",
+      "reversed",
+      "selected"
+    ]);
+    var invalid_attribute_name_character = /[\s'">/=\u{FDD0}-\u{FDEF}\u{FFFE}\u{FFFF}\u{1FFFE}\u{1FFFF}\u{2FFFE}\u{2FFFF}\u{3FFFE}\u{3FFFF}\u{4FFFE}\u{4FFFF}\u{5FFFE}\u{5FFFF}\u{6FFFE}\u{6FFFF}\u{7FFFE}\u{7FFFF}\u{8FFFE}\u{8FFFF}\u{9FFFE}\u{9FFFF}\u{AFFFE}\u{AFFFF}\u{BFFFE}\u{BFFFF}\u{CFFFE}\u{CFFFF}\u{DFFFE}\u{DFFFF}\u{EFFFE}\u{EFFFF}\u{FFFFE}\u{FFFFF}\u{10FFFE}\u{10FFFF}]/u;
+    function spread(args, classes_to_add) {
+      const attributes = Object.assign({}, ...args);
+      if (classes_to_add) {
+        if (attributes.class == null) {
+          attributes.class = classes_to_add;
+        } else {
+          attributes.class += " " + classes_to_add;
+        }
+      }
+      let str = "";
+      Object.keys(attributes).forEach((name) => {
+        if (invalid_attribute_name_character.test(name))
+          return;
+        const value = attributes[name];
+        if (value === true)
+          str += " " + name;
+        else if (boolean_attributes.has(name.toLowerCase())) {
+          if (value)
+            str += " " + name;
+        } else if (value != null) {
+          str += ` ${name}="${value}"`;
+        }
+      });
+      return str;
+    }
+    var escaped3 = {
+      '"': "&quot;",
+      "'": "&#39;",
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;"
+    };
+    function escape3(html) {
+      return String(html).replace(/["'&<>]/g, (match) => escaped3[match]);
+    }
+    function escape_attribute_value(value) {
+      return typeof value === "string" ? escape3(value) : value;
+    }
+    function escape_object(obj) {
+      const result = {};
+      for (const key in obj) {
+        result[key] = escape_attribute_value(obj[key]);
+      }
+      return result;
+    }
+    function each(items, fn) {
+      let str = "";
+      for (let i = 0; i < items.length; i += 1) {
+        str += fn(items[i], i);
+      }
+      return str;
+    }
+    var missing_component2 = {
+      $$render: () => ""
+    };
+    function validate_component2(component, name) {
+      if (!component || !component.$$render) {
+        if (name === "svelte:component")
+          name += " this={...}";
+        throw new Error(`<${name}> is not a valid SSR component. You may need to review your build config to ensure that dependencies are compiled, rather than imported as pre-compiled modules`);
+      }
+      return component;
+    }
+    function debug(file, line, column, values) {
+      console.log(`{@debug} ${file ? file + " " : ""}(${line}:${column})`);
+      console.log(values);
+      return "";
+    }
+    var on_destroy2;
+    function create_ssr_component2(fn) {
+      function $$render(result, props, bindings, slots, context) {
+        const parent_component = exports.current_component;
+        const $$ = {
+          on_destroy: on_destroy2,
+          context: new Map(parent_component ? parent_component.$$.context : context || []),
+          on_mount: [],
+          before_update: [],
+          after_update: [],
+          callbacks: blank_object2()
+        };
+        set_current_component2({ $$ });
+        const html = fn(result, props, bindings, slots);
+        set_current_component2(parent_component);
+        return html;
+      }
+      return {
+        render: (props = {}, { $$slots = {}, context = new Map() } = {}) => {
+          on_destroy2 = [];
+          const result = { title: "", head: "", css: new Set() };
+          const html = $$render(result, props, {}, $$slots, context);
+          run_all2(on_destroy2);
+          return {
+            html,
+            css: {
+              code: Array.from(result.css).map((css2) => css2.code).join("\n"),
+              map: null
+            },
+            head: result.title + result.head
+          };
+        },
+        $$render
+      };
+    }
+    function add_attribute2(name, value, boolean) {
+      if (value == null || boolean && !value)
+        return "";
+      return ` ${name}${value === true ? "" : `=${typeof value === "string" ? JSON.stringify(escape3(value)) : `"${value}"`}`}`;
+    }
+    function add_classes(classes) {
+      return classes ? ` class="${classes}"` : "";
+    }
+    function bind(component, name, callback) {
+      const index2 = component.$$.props[name];
+      if (index2 !== void 0) {
+        component.$$.bound[index2] = callback;
+        callback(component.$$.ctx[index2]);
+      }
+    }
+    function create_component(block) {
+      block && block.c();
+    }
+    function claim_component(block, parent_nodes) {
+      block && block.l(parent_nodes);
+    }
+    function mount_component(component, target, anchor, customElement) {
+      const { fragment, on_mount, on_destroy: on_destroy3, after_update } = component.$$;
+      fragment && fragment.m(target, anchor);
+      if (!customElement) {
+        add_render_callback(() => {
+          const new_on_destroy = on_mount.map(run2).filter(is_function);
+          if (on_destroy3) {
+            on_destroy3.push(...new_on_destroy);
+          } else {
+            run_all2(new_on_destroy);
+          }
+          component.$$.on_mount = [];
+        });
+      }
+      after_update.forEach(add_render_callback);
+    }
+    function destroy_component(component, detaching) {
+      const $$ = component.$$;
+      if ($$.fragment !== null) {
+        run_all2($$.on_destroy);
+        $$.fragment && $$.fragment.d(detaching);
+        $$.on_destroy = $$.fragment = null;
+        $$.ctx = [];
+      }
+    }
+    function make_dirty(component, i) {
+      if (component.$$.dirty[0] === -1) {
+        dirty_components.push(component);
+        schedule_update();
+        component.$$.dirty.fill(0);
+      }
+      component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
+    }
+    function init2(component, options2, instance, create_fragment, not_equal2, props, append_styles2, dirty = [-1]) {
+      const parent_component = exports.current_component;
+      set_current_component2(component);
+      const $$ = component.$$ = {
+        fragment: null,
+        ctx: null,
+        props,
+        update: noop3,
+        not_equal: not_equal2,
+        bound: blank_object2(),
+        on_mount: [],
+        on_destroy: [],
+        on_disconnect: [],
+        before_update: [],
+        after_update: [],
+        context: new Map(parent_component ? parent_component.$$.context : options2.context || []),
+        callbacks: blank_object2(),
+        dirty,
+        skip_bound: false,
+        root: options2.target || parent_component.$$.root
+      };
+      append_styles2 && append_styles2($$.root);
+      let ready = false;
+      $$.ctx = instance ? instance(component, options2.props || {}, (i, ret, ...rest) => {
+        const value = rest.length ? rest[0] : ret;
+        if ($$.ctx && not_equal2($$.ctx[i], $$.ctx[i] = value)) {
+          if (!$$.skip_bound && $$.bound[i])
+            $$.bound[i](value);
+          if (ready)
+            make_dirty(component, i);
+        }
+        return ret;
+      }) : [];
+      $$.update();
+      ready = true;
+      run_all2($$.before_update);
+      $$.fragment = create_fragment ? create_fragment($$.ctx) : false;
+      if (options2.target) {
+        if (options2.hydrate) {
+          start_hydrating();
+          const nodes = children(options2.target);
+          $$.fragment && $$.fragment.l(nodes);
+          nodes.forEach(detach);
+        } else {
+          $$.fragment && $$.fragment.c();
+        }
+        if (options2.intro)
+          transition_in(component.$$.fragment);
+        mount_component(component, options2.target, options2.anchor, options2.customElement);
+        end_hydrating();
+        flush();
+      }
+      set_current_component2(parent_component);
+    }
+    if (typeof HTMLElement === "function") {
+      exports.SvelteElement = class extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: "open" });
+        }
+        connectedCallback() {
+          const { on_mount } = this.$$;
+          this.$$.on_disconnect = on_mount.map(run2).filter(is_function);
+          for (const key in this.$$.slotted) {
+            this.appendChild(this.$$.slotted[key]);
+          }
+        }
+        attributeChangedCallback(attr2, _oldValue, newValue) {
+          this[attr2] = newValue;
+        }
+        disconnectedCallback() {
+          run_all2(this.$$.on_disconnect);
+        }
+        $destroy() {
+          destroy_component(this, 1);
+          this.$destroy = noop3;
+        }
+        $on(type, callback) {
+          const callbacks = this.$$.callbacks[type] || (this.$$.callbacks[type] = []);
+          callbacks.push(callback);
+          return () => {
+            const index2 = callbacks.indexOf(callback);
+            if (index2 !== -1)
+              callbacks.splice(index2, 1);
+          };
+        }
+        $set($$props) {
+          if (this.$$set && !is_empty($$props)) {
+            this.$$.skip_bound = true;
+            this.$$set($$props);
+            this.$$.skip_bound = false;
+          }
+        }
+      };
+    }
+    var SvelteComponent = class {
+      $destroy() {
+        destroy_component(this, 1);
+        this.$destroy = noop3;
+      }
+      $on(type, callback) {
+        const callbacks = this.$$.callbacks[type] || (this.$$.callbacks[type] = []);
+        callbacks.push(callback);
+        return () => {
+          const index2 = callbacks.indexOf(callback);
+          if (index2 !== -1)
+            callbacks.splice(index2, 1);
+        };
+      }
+      $set($$props) {
+        if (this.$$set && !is_empty($$props)) {
+          this.$$.skip_bound = true;
+          this.$$set($$props);
+          this.$$.skip_bound = false;
+        }
+      }
+    };
+    function dispatch_dev(type, detail) {
+      document.dispatchEvent(custom_event(type, Object.assign({ version: "3.40.2" }, detail), true));
+    }
+    function append_dev(target, node) {
+      dispatch_dev("SvelteDOMInsert", { target, node });
+      append(target, node);
+    }
+    function append_hydration_dev(target, node) {
+      dispatch_dev("SvelteDOMInsert", { target, node });
+      append_hydration(target, node);
+    }
+    function insert_dev(target, node, anchor) {
+      dispatch_dev("SvelteDOMInsert", { target, node, anchor });
+      insert(target, node, anchor);
+    }
+    function insert_hydration_dev(target, node, anchor) {
+      dispatch_dev("SvelteDOMInsert", { target, node, anchor });
+      insert_hydration(target, node, anchor);
+    }
+    function detach_dev(node) {
+      dispatch_dev("SvelteDOMRemove", { node });
+      detach(node);
+    }
+    function detach_between_dev(before, after) {
+      while (before.nextSibling && before.nextSibling !== after) {
+        detach_dev(before.nextSibling);
+      }
+    }
+    function detach_before_dev(after) {
+      while (after.previousSibling) {
+        detach_dev(after.previousSibling);
+      }
+    }
+    function detach_after_dev(before) {
+      while (before.nextSibling) {
+        detach_dev(before.nextSibling);
+      }
+    }
+    function listen_dev(node, event, handler2, options2, has_prevent_default, has_stop_propagation) {
+      const modifiers = options2 === true ? ["capture"] : options2 ? Array.from(Object.keys(options2)) : [];
+      if (has_prevent_default)
+        modifiers.push("preventDefault");
+      if (has_stop_propagation)
+        modifiers.push("stopPropagation");
+      dispatch_dev("SvelteDOMAddEventListener", { node, event, handler: handler2, modifiers });
+      const dispose = listen(node, event, handler2, options2);
+      return () => {
+        dispatch_dev("SvelteDOMRemoveEventListener", { node, event, handler: handler2, modifiers });
+        dispose();
+      };
+    }
+    function attr_dev(node, attribute, value) {
+      attr(node, attribute, value);
+      if (value == null)
+        dispatch_dev("SvelteDOMRemoveAttribute", { node, attribute });
+      else
+        dispatch_dev("SvelteDOMSetAttribute", { node, attribute, value });
+    }
+    function prop_dev(node, property, value) {
+      node[property] = value;
+      dispatch_dev("SvelteDOMSetProperty", { node, property, value });
+    }
+    function dataset_dev(node, property, value) {
+      node.dataset[property] = value;
+      dispatch_dev("SvelteDOMSetDataset", { node, property, value });
+    }
+    function set_data_dev(text2, data) {
+      data = "" + data;
+      if (text2.wholeText === data)
+        return;
+      dispatch_dev("SvelteDOMSetData", { node: text2, data });
+      text2.data = data;
+    }
+    function validate_each_argument(arg) {
+      if (typeof arg !== "string" && !(arg && typeof arg === "object" && "length" in arg)) {
+        let msg = "{#each} only iterates over array-like objects.";
+        if (typeof Symbol === "function" && arg && Symbol.iterator in arg) {
+          msg += " You can use a spread to convert this iterable into an array.";
+        }
+        throw new Error(msg);
+      }
+    }
+    function validate_slots(name, slot, keys) {
+      for (const slot_key of Object.keys(slot)) {
+        if (!~keys.indexOf(slot_key)) {
+          console.warn(`<${name}> received an unexpected slot "${slot_key}".`);
+        }
+      }
+    }
+    var SvelteComponentDev = class extends SvelteComponent {
+      constructor(options2) {
+        if (!options2 || !options2.target && !options2.$$inline) {
+          throw new Error("'target' is a required option");
+        }
+        super();
+      }
+      $destroy() {
+        super.$destroy();
+        this.$destroy = () => {
+          console.warn("Component was already destroyed");
+        };
+      }
+      $capture_state() {
+      }
+      $inject_state() {
+      }
+    };
+    var SvelteComponentTyped = class extends SvelteComponentDev {
+      constructor(options2) {
+        super(options2);
+      }
+    };
+    function loop_guard(timeout) {
+      const start = Date.now();
+      return () => {
+        if (Date.now() - start > timeout) {
+          throw new Error("Infinite loop detected");
+        }
+      };
+    }
+    exports.HtmlTag = HtmlTag;
+    exports.HtmlTagHydration = HtmlTagHydration;
+    exports.SvelteComponent = SvelteComponent;
+    exports.SvelteComponentDev = SvelteComponentDev;
+    exports.SvelteComponentTyped = SvelteComponentTyped;
+    exports.action_destroyer = action_destroyer;
+    exports.add_attribute = add_attribute2;
+    exports.add_classes = add_classes;
+    exports.add_flush_callback = add_flush_callback;
+    exports.add_location = add_location;
+    exports.add_render_callback = add_render_callback;
+    exports.add_resize_listener = add_resize_listener;
+    exports.add_transform = add_transform;
+    exports.afterUpdate = afterUpdate2;
+    exports.append = append;
+    exports.append_dev = append_dev;
+    exports.append_empty_stylesheet = append_empty_stylesheet;
+    exports.append_hydration = append_hydration;
+    exports.append_hydration_dev = append_hydration_dev;
+    exports.append_styles = append_styles;
+    exports.assign = assign;
+    exports.attr = attr;
+    exports.attr_dev = attr_dev;
+    exports.attribute_to_object = attribute_to_object;
+    exports.beforeUpdate = beforeUpdate;
+    exports.bind = bind;
+    exports.binding_callbacks = binding_callbacks;
+    exports.blank_object = blank_object2;
+    exports.bubble = bubble;
+    exports.check_outros = check_outros;
+    exports.children = children;
+    exports.claim_component = claim_component;
+    exports.claim_element = claim_element;
+    exports.claim_html_tag = claim_html_tag;
+    exports.claim_space = claim_space;
+    exports.claim_text = claim_text;
+    exports.clear_loops = clear_loops;
+    exports.component_subscribe = component_subscribe;
+    exports.compute_rest_props = compute_rest_props;
+    exports.compute_slots = compute_slots;
+    exports.createEventDispatcher = createEventDispatcher;
+    exports.create_animation = create_animation;
+    exports.create_bidirectional_transition = create_bidirectional_transition;
+    exports.create_component = create_component;
+    exports.create_in_transition = create_in_transition;
+    exports.create_out_transition = create_out_transition;
+    exports.create_slot = create_slot;
+    exports.create_ssr_component = create_ssr_component2;
+    exports.custom_event = custom_event;
+    exports.dataset_dev = dataset_dev;
+    exports.debug = debug;
+    exports.destroy_block = destroy_block;
+    exports.destroy_component = destroy_component;
+    exports.destroy_each = destroy_each;
+    exports.detach = detach;
+    exports.detach_after_dev = detach_after_dev;
+    exports.detach_before_dev = detach_before_dev;
+    exports.detach_between_dev = detach_between_dev;
+    exports.detach_dev = detach_dev;
+    exports.dirty_components = dirty_components;
+    exports.dispatch_dev = dispatch_dev;
+    exports.each = each;
+    exports.element = element;
+    exports.element_is = element_is;
+    exports.empty = empty2;
+    exports.end_hydrating = end_hydrating;
+    exports.escape = escape3;
+    exports.escape_attribute_value = escape_attribute_value;
+    exports.escape_object = escape_object;
+    exports.escaped = escaped3;
+    exports.exclude_internal_props = exclude_internal_props;
+    exports.fix_and_destroy_block = fix_and_destroy_block;
+    exports.fix_and_outro_and_destroy_block = fix_and_outro_and_destroy_block;
+    exports.fix_position = fix_position;
+    exports.flush = flush;
+    exports.getAllContexts = getAllContexts;
+    exports.getContext = getContext2;
+    exports.get_binding_group_value = get_binding_group_value;
+    exports.get_current_component = get_current_component2;
+    exports.get_custom_elements_slots = get_custom_elements_slots;
+    exports.get_root_for_node = get_root_for_node;
+    exports.get_slot_changes = get_slot_changes;
+    exports.get_spread_object = get_spread_object;
+    exports.get_spread_update = get_spread_update;
+    exports.get_store_value = get_store_value;
+    exports.globals = globals;
+    exports.group_outros = group_outros;
+    exports.handle_promise = handle_promise;
+    exports.hasContext = hasContext;
+    exports.has_prop = has_prop;
+    exports.identity = identity;
+    exports.init = init2;
+    exports.insert = insert;
+    exports.insert_dev = insert_dev;
+    exports.insert_hydration = insert_hydration;
+    exports.insert_hydration_dev = insert_hydration_dev;
+    exports.intros = intros;
+    exports.invalid_attribute_name_character = invalid_attribute_name_character;
+    exports.is_client = is_client;
+    exports.is_crossorigin = is_crossorigin;
+    exports.is_empty = is_empty;
+    exports.is_function = is_function;
+    exports.is_promise = is_promise;
+    exports.listen = listen;
+    exports.listen_dev = listen_dev;
+    exports.loop = loop;
+    exports.loop_guard = loop_guard;
+    exports.missing_component = missing_component2;
+    exports.mount_component = mount_component;
+    exports.noop = noop3;
+    exports.not_equal = not_equal;
+    exports.null_to_empty = null_to_empty;
+    exports.object_without_properties = object_without_properties;
+    exports.onDestroy = onDestroy;
+    exports.onMount = onMount;
+    exports.once = once;
+    exports.outro_and_destroy_block = outro_and_destroy_block;
+    exports.prevent_default = prevent_default;
+    exports.prop_dev = prop_dev;
+    exports.query_selector_all = query_selector_all;
+    exports.run = run2;
+    exports.run_all = run_all2;
+    exports.safe_not_equal = safe_not_equal3;
+    exports.schedule_update = schedule_update;
+    exports.select_multiple_value = select_multiple_value;
+    exports.select_option = select_option;
+    exports.select_options = select_options;
+    exports.select_value = select_value;
+    exports.self = self;
+    exports.setContext = setContext2;
+    exports.set_attributes = set_attributes;
+    exports.set_current_component = set_current_component2;
+    exports.set_custom_element_data = set_custom_element_data;
+    exports.set_data = set_data;
+    exports.set_data_dev = set_data_dev;
+    exports.set_input_type = set_input_type;
+    exports.set_input_value = set_input_value;
+    exports.set_now = set_now;
+    exports.set_raf = set_raf;
+    exports.set_store_value = set_store_value;
+    exports.set_style = set_style;
+    exports.set_svg_attributes = set_svg_attributes;
+    exports.space = space;
+    exports.spread = spread;
+    exports.src_url_equal = src_url_equal;
+    exports.start_hydrating = start_hydrating;
+    exports.stop_propagation = stop_propagation;
+    exports.subscribe = subscribe2;
+    exports.svg_element = svg_element;
+    exports.text = text;
+    exports.tick = tick;
+    exports.time_ranges_to_array = time_ranges_to_array;
+    exports.to_number = to_number;
+    exports.toggle_class = toggle_class;
+    exports.transition_in = transition_in;
+    exports.transition_out = transition_out;
+    exports.trusted = trusted;
+    exports.update_await_block_branch = update_await_block_branch;
+    exports.update_keyed_each = update_keyed_each;
+    exports.update_slot = update_slot;
+    exports.update_slot_spread = update_slot_spread;
+    exports.validate_component = validate_component2;
+    exports.validate_each_argument = validate_each_argument;
+    exports.validate_each_keys = validate_each_keys;
+    exports.validate_slots = validate_slots;
+    exports.validate_store = validate_store;
+    exports.xlink_attr = xlink_attr;
+  }
+});
+
+// node_modules/svelte/store/index.js
+var require_store = __commonJS({
+  "node_modules/svelte/store/index.js"(exports) {
+    init_shims();
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var internal = require_internal();
+    var subscriber_queue3 = [];
+    function readable2(value, start) {
+      return {
+        subscribe: writable3(value, start).subscribe
+      };
+    }
+    function writable3(value, start = internal.noop) {
+      let stop;
+      const subscribers = new Set();
+      function set(new_value) {
+        if (internal.safe_not_equal(value, new_value)) {
+          value = new_value;
+          if (stop) {
+            const run_queue = !subscriber_queue3.length;
+            for (const subscriber of subscribers) {
+              subscriber[1]();
+              subscriber_queue3.push(subscriber, value);
+            }
+            if (run_queue) {
+              for (let i = 0; i < subscriber_queue3.length; i += 2) {
+                subscriber_queue3[i][0](subscriber_queue3[i + 1]);
+              }
+              subscriber_queue3.length = 0;
+            }
+          }
+        }
+      }
+      function update(fn) {
+        set(fn(value));
+      }
+      function subscribe2(run2, invalidate = internal.noop) {
+        const subscriber = [run2, invalidate];
+        subscribers.add(subscriber);
+        if (subscribers.size === 1) {
+          stop = start(set) || internal.noop;
+        }
+        run2(value);
+        return () => {
+          subscribers.delete(subscriber);
+          if (subscribers.size === 0) {
+            stop();
+            stop = null;
+          }
+        };
+      }
+      return { set, update, subscribe: subscribe2 };
+    }
+    function derived(stores, fn, initial_value) {
+      const single = !Array.isArray(stores);
+      const stores_array = single ? [stores] : stores;
+      const auto = fn.length < 2;
+      return readable2(initial_value, (set) => {
+        let inited = false;
+        const values = [];
+        let pending = 0;
+        let cleanup = internal.noop;
+        const sync = () => {
+          if (pending) {
+            return;
+          }
+          cleanup();
+          const result = fn(single ? values[0] : values, set);
+          if (auto) {
+            set(result);
+          } else {
+            cleanup = internal.is_function(result) ? result : internal.noop;
+          }
+        };
+        const unsubscribers = stores_array.map((store, i) => internal.subscribe(store, (value) => {
+          values[i] = value;
+          pending &= ~(1 << i);
+          if (inited) {
+            sync();
+          }
+        }, () => {
+          pending |= 1 << i;
+        }));
+        inited = true;
+        sync();
+        return function stop() {
+          internal.run_all(unsubscribers);
+          cleanup();
+        };
+      });
+    }
+    Object.defineProperty(exports, "get", {
+      enumerable: true,
+      get: function() {
+        return internal.get_store_value;
+      }
+    });
+    exports.derived = derived;
+    exports.readable = readable2;
+    exports.writable = writable3;
+  }
+});
+
+// node_modules/svelte-local-storage-store/dist/index.js
+var require_dist = __commonJS({
+  "node_modules/svelte-local-storage-store/dist/index.js"(exports) {
+    init_shims();
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var _store = require_store();
+    var stores = {};
+    function writable3(key, initialValue) {
+      const browser = typeof localStorage != "undefined";
+      function updateStorage(key2, value) {
+        if (!browser)
+          return;
+        localStorage.setItem(key2, JSON.stringify(value));
+      }
+      if (!stores[key]) {
+        const store = _store.writable.call(void 0, initialValue, (set2) => {
+          const json = browser ? localStorage.getItem(key) : null;
+          if (json) {
+            set2(JSON.parse(json));
+          }
+          if (browser) {
+            const handleStorage = (event) => {
+              if (event.key === key)
+                set2(event.newValue ? JSON.parse(event.newValue) : null);
+            };
+            window.addEventListener("storage", handleStorage);
+            return () => window.removeEventListener("storage", handleStorage);
+          }
+        });
+        const { subscribe: subscribe2, set } = store;
+        stores[key] = {
+          set(value) {
+            updateStorage(key, value);
+            set(value);
+          },
+          update(updater) {
+            const value = updater(_store.get.call(void 0, store));
+            updateStorage(key, value);
+            set(value);
+          },
+          subscribe: subscribe2
+        };
+      }
+      return stores[key];
+    }
+    exports.writable = writable3;
+  }
+});
+
 // .svelte-kit/netlify/entry.js
 __export(exports, {
   handler: () => handler
@@ -2409,6 +4572,7 @@ function v4() {
 }
 
 // .svelte-kit/output/server/app.js
+var import_svelte_local_storage_store = __toModule(require_dist());
 function noop2() {
 }
 function run(fn) {
@@ -2419,6 +4583,9 @@ function blank_object() {
 }
 function run_all(fns) {
   fns.forEach(run);
+}
+function safe_not_equal2(a, b) {
+  return a != a ? b == b : a !== b || (a && typeof a === "object" || typeof a === "function");
 }
 function subscribe(store, ...callbacks) {
   if (store == null) {
@@ -2577,9 +4744,9 @@ function init(settings = default_settings) {
     amp: false,
     dev: false,
     entry: {
-      file: "/./_app/start-253b66d8.js",
+      file: "/./_app/start-bd222099.js",
       css: ["/./_app/assets/start-0826e215.css"],
-      js: ["/./_app/start-253b66d8.js", "/./_app/chunks/vendor-b7743159.js"]
+      js: ["/./_app/start-bd222099.js", "/./_app/chunks/vendor-79c36c28.js"]
     },
     fetched: void 0,
     floc: false,
@@ -2610,7 +4777,7 @@ function init(settings = default_settings) {
 }
 var empty = () => ({});
 var manifest = {
-  assets: [{ "file": "favicon.png", "size": 1369, "type": "image/png" }, { "file": "favicon.svg", "size": 977, "type": "image/svg+xml" }, { "file": "robots.txt", "size": 67, "type": "text/plain" }],
+  assets: [{ "file": "favicon.png", "size": 1369, "type": "image/png" }, { "file": "favicon.svg", "size": 977, "type": "image/svg+xml" }, { "file": "fonts/Inter-Bold.woff2", "size": 106140, "type": "font/woff2" }, { "file": "fonts/Inter-BoldItalic.woff2", "size": 111808, "type": "font/woff2" }, { "file": "fonts/Inter-italic.var.woff2", "size": 245036, "type": "font/woff2" }, { "file": "fonts/Inter-Italic.woff2", "size": 106876, "type": "font/woff2" }, { "file": "fonts/Inter-Regular.woff2", "size": 98868, "type": "font/woff2" }, { "file": "fonts/Inter-roman.var.woff2", "size": 227180, "type": "font/woff2" }, { "file": "robots.txt", "size": 67, "type": "text/plain" }],
   layout: "src/routes/__layout.svelte",
   error: ".svelte-kit/build/components/error.svelte",
   routes: [
@@ -2623,9 +4790,9 @@ var manifest = {
     },
     {
       type: "page",
-      pattern: /^\/about\/?$/,
+      pattern: /^\/work\/?$/,
       params: empty,
-      a: ["src/routes/__layout.svelte", "src/routes/about.svelte"],
+      a: ["src/routes/__layout.svelte", "src/routes/work/index.svelte"],
       b: [".svelte-kit/build/components/error.svelte"]
     }
   ]
@@ -2643,13 +4810,13 @@ var module_lookup = {
     return error2;
   }),
   "src/routes/index.svelte": () => Promise.resolve().then(function() {
-    return index;
+    return index$1;
   }),
-  "src/routes/about.svelte": () => Promise.resolve().then(function() {
-    return about;
+  "src/routes/work/index.svelte": () => Promise.resolve().then(function() {
+    return index;
   })
 };
-var metadata_lookup = { "src/routes/__layout.svelte": { "entry": "/./_app/pages/__layout.svelte-2b93f6eb.js", "css": ["/./_app/assets/pages/__layout.svelte-a5180c08.css"], "js": ["/./_app/pages/__layout.svelte-2b93f6eb.js", "/./_app/chunks/vendor-b7743159.js"], "styles": [] }, ".svelte-kit/build/components/error.svelte": { "entry": "/./_app/error.svelte-2d05f611.js", "css": [], "js": ["/./_app/error.svelte-2d05f611.js", "/./_app/chunks/vendor-b7743159.js"], "styles": [] }, "src/routes/index.svelte": { "entry": "/./_app/pages/index.svelte-d8353afd.js", "css": ["/./_app/assets/pages/index.svelte-4cafa2ee.css"], "js": ["/./_app/pages/index.svelte-d8353afd.js", "/./_app/chunks/vendor-b7743159.js"], "styles": [] }, "src/routes/about.svelte": { "entry": "/./_app/pages/about.svelte-61557d13.js", "css": [], "js": ["/./_app/pages/about.svelte-61557d13.js", "/./_app/chunks/vendor-b7743159.js"], "styles": [] } };
+var metadata_lookup = { "src/routes/__layout.svelte": { "entry": "/./_app/pages/__layout.svelte-4aaf9d37.js", "css": ["/./_app/assets/pages/__layout.svelte-49df81dd.css"], "js": ["/./_app/pages/__layout.svelte-4aaf9d37.js", "/./_app/chunks/vendor-79c36c28.js", "/./_app/chunks/stores-bdf2e9d0.js"], "styles": [] }, ".svelte-kit/build/components/error.svelte": { "entry": "/./_app/error.svelte-e457d27d.js", "css": [], "js": ["/./_app/error.svelte-e457d27d.js", "/./_app/chunks/vendor-79c36c28.js"], "styles": [] }, "src/routes/index.svelte": { "entry": "/./_app/pages/index.svelte-aa3a74d2.js", "css": ["/./_app/assets/pages/index.svelte-e248a3dd.css"], "js": ["/./_app/pages/index.svelte-aa3a74d2.js", "/./_app/chunks/vendor-79c36c28.js", "/./_app/chunks/stores-bdf2e9d0.js"], "styles": [] }, "src/routes/work/index.svelte": { "entry": "/./_app/pages/work/index.svelte-c8ab2a36.js", "css": [], "js": ["/./_app/pages/work/index.svelte-c8ab2a36.js", "/./_app/chunks/vendor-79c36c28.js"], "styles": [] } };
 async function load_component(file) {
   return {
     module: await module_lookup[file](),
@@ -2657,10 +4824,10 @@ async function load_component(file) {
   };
 }
 function render(request, {
-  prerender: prerender2
+  prerender
 } = {}) {
   const host = request.headers["host"];
-  return respond({ ...request, host }, options, { prerender: prerender2 });
+  return respond({ ...request, host }, options, { prerender });
 }
 var getStores = () => {
   const stores = getContext("__svelte__");
@@ -2687,8 +4854,8 @@ var page = {
   }
 };
 var css$4 = {
-  code: ".small.svelte-12qkcbw{border-radius:.125rem;height:1.25rem;width:1.25rem}.letter-color.svelte-12qkcbw{fill:#322eff}@media(prefers-color-scheme:dark){.letter-color.svelte-12qkcbw{fill:#7270ff}}",
-  map: '{"version":3,"file":"Logo.svelte","sources":["Logo.svelte"],"sourcesContent":["<script>\\r\\n    export let small = false;\\r\\n    export let color = false;\\r\\n<\/script>\\r\\n\\r\\n<svg class=\\"h-36 w-36 rounded\\" class:small={small} width=\\"400\\" height=\\"400\\" viewBox=\\"0 0 400 400\\" fill=\\"none\\" xmlns=\\"http://www.w3.org/2000/svg\\"><path d=\\"M0 0h400v400H0V0z\\" class:letter-color={color} class=\\"fill-current\\"/><path d=\\"M148.649 153.313l76.698-6.036C212.777 85.419 153.57 45.562 81.006 51.273c-83.74 6.59-145.236 70.734-137.164 173.304 7.808 99.202 73.569 155.796 163.432 148.723 80.678-6.349 134.453-60.952 127.826-145.151l-3.265-41.487-135.178 10.639 4.35 55.265 62.154-4.892c1.837 33.128-19.476 55.908-60.504 59.137-46.998 3.699-76.83-28.92-81.577-89.237-4.71-59.858 21.218-96.403 66.686-99.981 30.311-2.386 52.147 10.837 60.883 35.72zM309.33 353.085l15.486-67.455 108.234-8.518 25.848 64.202 81.444-6.41-130.46-305.202-100.886 7.94-81.11 321.853 81.444-6.41zm29.021-126.438l26.004-113.878 2.449-.193 43.652 108.396-72.105 5.675z\\" class=\\"fill-white dark:fill-rich-purple-900\\" /></svg>\\r\\n\\r\\n<style lang=\\"postcss\\">.small{border-radius:.125rem;height:1.25rem;width:1.25rem}.letter-color{fill:#322eff}@media (prefers-color-scheme:dark){.letter-color{fill:#7270ff}}</style>"],"names":[],"mappings":"AAOsB,qBAAM,CAAC,cAAc,OAAO,CAAC,OAAO,OAAO,CAAC,MAAM,OAAO,CAAC,4BAAa,CAAC,KAAK,OAAO,CAAC,MAAM,AAAC,sBAAsB,IAAI,CAAC,CAAC,4BAAa,CAAC,KAAK,OAAO,CAAC,CAAC"}'
+  code: ".small.svelte-8c9r76{border-radius:.125rem;height:1.25rem;width:1.25rem}",
+  map: `{"version":3,"file":"Logo.svelte","sources":["Logo.svelte"],"sourcesContent":["<script>\\r\\n\\texport let small = false;\\r\\n\\texport let color = false;\\r\\n<\/script>\\r\\n\\r\\n<svg\\r\\n\\tclass=\\"h-36 w-36 rounded\\"\\r\\n\\tclass:small\\r\\n\\twidth=\\"36\\"\\r\\n\\theight=\\"36\\"\\r\\n\\tviewBox=\\"0 0 36 36\\"\\r\\nfill=\\"none\\"\\r\\n\\txmlns=\\"http://www.w3.org/2000/svg\\"\\r\\n>\\r\\n\\t<path d=\\"M0 0h36v36H0V0z\\" class=\\"{color ? 'fill-rich-purple-500 dark:fill-rich-purple-300' : 'fill-current'} transition-colors\\" />\\r\\n\\t<path\\r\\n\\t\\td=\\"M13.378 13.798l6.903-.543c-1.131-5.567-6.46-9.154-12.99-8.64-7.537.593-13.072 6.366-12.345 15.597.702 8.928 6.62 14.022 14.709 13.385 7.26-.571 12.1-5.486 11.504-13.063l-.294-3.734-12.166.957.392 4.974 5.593-.44c.166 2.981-1.752 5.032-5.445 5.322-4.23.333-6.915-2.603-7.342-8.031-.424-5.387 1.91-8.676 6.002-8.998 2.728-.215 4.693.975 5.48 3.214zM27.84 31.778l1.393-6.071 9.741-.767 2.327 5.778 7.33-.576L36.889 2.672l-9.08.715-7.3 28.967 7.33-.577zm2.611-11.38l2.34-10.249.221-.017 3.929 9.756-6.49.51z\\"\\r\\n\\t\\tclass=\\"fill-white dark:fill-rich-purple-900 transition-colors\\"\\r\\n\\t/>\\r\\n</svg>\\r\\n\\r\\n<style lang=\\"postcss\\">.small{border-radius:.125rem;height:1.25rem;width:1.25rem}</style>\\r\\n"],"names":[],"mappings":"AAqBsB,oBAAM,CAAC,cAAc,OAAO,CAAC,OAAO,OAAO,CAAC,MAAM,OAAO,CAAC"}`
 };
 var Logo = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let { small = false } = $$props;
@@ -2698,39 +4865,154 @@ var Logo = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   if ($$props.color === void 0 && $$bindings.color && color !== void 0)
     $$bindings.color(color);
   $$result.css.add(css$4);
-  return `<svg class="${["h-36 w-36 rounded svelte-12qkcbw", small ? "small" : ""].join(" ").trim()}" width="${"400"}" height="${"400"}" viewBox="${"0 0 400 400"}" fill="${"none"}" xmlns="${"http://www.w3.org/2000/svg"}"><path d="${"M0 0h400v400H0V0z"}" class="${["fill-current svelte-12qkcbw", color ? "letter-color" : ""].join(" ").trim()}"></path><path d="${"M148.649 153.313l76.698-6.036C212.777 85.419 153.57 45.562 81.006 51.273c-83.74 6.59-145.236 70.734-137.164 173.304 7.808 99.202 73.569 155.796 163.432 148.723 80.678-6.349 134.453-60.952 127.826-145.151l-3.265-41.487-135.178 10.639 4.35 55.265 62.154-4.892c1.837 33.128-19.476 55.908-60.504 59.137-46.998 3.699-76.83-28.92-81.577-89.237-4.71-59.858 21.218-96.403 66.686-99.981 30.311-2.386 52.147 10.837 60.883 35.72zM309.33 353.085l15.486-67.455 108.234-8.518 25.848 64.202 81.444-6.41-130.46-305.202-100.886 7.94-81.11 321.853 81.444-6.41zm29.021-126.438l26.004-113.878 2.449-.193 43.652 108.396-72.105 5.675z"}" class="${"fill-white dark:fill-rich-purple-900"}"></path></svg>`;
+  return `<svg class="${["h-36 w-36 rounded svelte-8c9r76", small ? "small" : ""].join(" ").trim()}" width="${"36"}" height="${"36"}" viewBox="${"0 0 36 36"}" fill="${"none"}" xmlns="${"http://www.w3.org/2000/svg"}"><path d="${"M0 0h36v36H0V0z"}" class="${escape2(color ? "fill-rich-purple-500 dark:fill-rich-purple-300" : "fill-current") + " transition-colors"}"></path><path d="${"M13.378 13.798l6.903-.543c-1.131-5.567-6.46-9.154-12.99-8.64-7.537.593-13.072 6.366-12.345 15.597.702 8.928 6.62 14.022 14.709 13.385 7.26-.571 12.1-5.486 11.504-13.063l-.294-3.734-12.166.957.392 4.974 5.593-.44c.166 2.981-1.752 5.032-5.445 5.322-4.23.333-6.915-2.603-7.342-8.031-.424-5.387 1.91-8.676 6.002-8.998 2.728-.215 4.693.975 5.48 3.214zM27.84 31.778l1.393-6.071 9.741-.767 2.327 5.778 7.33-.576L36.889 2.672l-9.08.715-7.3 28.967 7.33-.577zm2.611-11.38l2.34-10.249.221-.017 3.929 9.756-6.49.51z"}" class="${"fill-white dark:fill-rich-purple-900 transition-colors"}"></path></svg>`;
+});
+var subscriber_queue2 = [];
+function readable(value, start) {
+  return {
+    subscribe: writable2(value, start).subscribe
+  };
+}
+function writable2(value, start = noop2) {
+  let stop;
+  const subscribers = new Set();
+  function set(new_value) {
+    if (safe_not_equal2(value, new_value)) {
+      value = new_value;
+      if (stop) {
+        const run_queue = !subscriber_queue2.length;
+        for (const subscriber of subscribers) {
+          subscriber[1]();
+          subscriber_queue2.push(subscriber, value);
+        }
+        if (run_queue) {
+          for (let i = 0; i < subscriber_queue2.length; i += 2) {
+            subscriber_queue2[i][0](subscriber_queue2[i + 1]);
+          }
+          subscriber_queue2.length = 0;
+        }
+      }
+    }
+  }
+  function update(fn) {
+    set(fn(value));
+  }
+  function subscribe2(run2, invalidate = noop2) {
+    const subscriber = [run2, invalidate];
+    subscribers.add(subscriber);
+    if (subscribers.size === 1) {
+      stop = start(set) || noop2;
+    }
+    run2(value);
+    return () => {
+      subscribers.delete(subscriber);
+      if (subscribers.size === 0) {
+        stop();
+        stop = null;
+      }
+    };
+  }
+  return { set, update, subscribe: subscribe2 };
+}
+var reducedMotion = readable(false, (set) => {
+  const query = "(prefers-reduced-motion: no-preference)";
+  const mediaQueryList = typeof window !== "undefined" ? window.matchMedia(query) : {};
+  const onChange = () => set(!mediaQueryList.matches);
+  if (typeof window !== "undefined") {
+    mediaQueryList.addListener(onChange);
+    onChange();
+  }
+  return () => {
+    if (typeof window !== "undefined")
+      mediaQueryList.removeListener(onChange);
+  };
+});
+var prefersColorSchemeDark = readable(false, (set) => {
+  const query = "(prefers-color-scheme: light)";
+  const mediaQueryList = typeof window !== "undefined" ? window.matchMedia(query) : {};
+  const onChange = () => set(!mediaQueryList.matches);
+  if (typeof window !== "undefined") {
+    mediaQueryList.addListener(onChange);
+    onChange();
+  }
+  return () => {
+    if (typeof window !== "undefined")
+      mediaQueryList.removeListener(onChange);
+  };
+});
+var ThemeMode = {
+  AUTO: "auto",
+  LIGHT: "light",
+  DARK: "dark"
+};
+var preferences = (0, import_svelte_local_storage_store.writable)("preferences", {
+  theme: ThemeMode.AUTO
+});
+var transitonDuration = "duration-500";
+var ThemePicker = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let isDay;
+  let isAuto;
+  let isNight;
+  let rayTransform;
+  let rayOpacity;
+  let starScale;
+  let $preferences, $$unsubscribe_preferences;
+  $$unsubscribe_preferences = subscribe(preferences, (value) => $preferences = value);
+  isDay = $preferences.theme === ThemeMode.LIGHT;
+  isAuto = $preferences.theme === ThemeMode.AUTO;
+  isNight = !isDay && !isAuto;
+  rayTransform = isNight ? 6 : isAuto ? 0.5 : 0;
+  rayOpacity = isAuto ? 0.4 : isDay ? 1 : 0;
+  starScale = isDay || isAuto ? 0 : 1.25;
+  $$unsubscribe_preferences();
+  return `<button class="${""}"><svg class="${"w-36 h-36"}" width="${"24"}" height="${"24"}" viewBox="${"0 0 24 24"}" fill="${"none"}" xmlns="${"http://www.w3.org/2000/svg"}"><defs><clipPath id="${"sun-clip"}"><circle cx="${"12"}" cy="${"12"}" r="${"5.5"}" transform="${"scale(1.5)"}" style="${"transform-origin: center center"}"></circle></clipPath></defs><path class="${"transition " + escape2(transitonDuration)}" d="${"M12 4V1"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(0, " + escape2(rayTransform) + ")"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}" d="${"M12 23V20"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(0, -" + escape2(rayTransform) + ")"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}" d="${"M20 12L23 12"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(-" + escape2(rayTransform) + ", 0)"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}" d="${"M1 12L4 12"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(" + escape2(rayTransform) + ", 0)"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}" d="${"M17.657 6.34324L19.7783 4.22192"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(-" + escape2(rayTransform) + ", " + escape2(rayTransform) + ")"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}" d="${"M4.22194 19.7783L6.34326 17.657"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(" + escape2(rayTransform) + ", -" + escape2(rayTransform) + ")"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}" d="${"M17.657 17.657L19.7783 19.7783"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(-" + escape2(rayTransform) + ", -" + escape2(rayTransform) + ")"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}" d="${"M4.22194 4.22194L6.34326 6.34326"}"${add_attribute("opacity", rayOpacity, 0)} transform="${"translate(" + escape2(rayTransform) + ", " + escape2(rayTransform) + ")"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}"></path><path class="${"transition " + escape2(transitonDuration)}"${add_attribute("opacity", isNight ? 1 : 0, 0)} transform="${"translate(7.5, 7.5) scale(" + escape2(isNight ? 1.1 : 0.1) + ")"}" fill-rule="${"evenodd"}" clip-rule="${"evenodd"}" d="${"M1.27586 9.42157C5.77489 9.42157 9.42208 5.77439 9.42208 1.27536C9.42208 0.841482 9.38816 0.415526 9.32282 0C11.5582 1.14832 13.0875 3.47707 13.0875 6.16301C13.0875 9.98719 9.98739 13.0873 6.16321 13.0873C3.47712 13.0873 1.14825 11.5578 0 9.32224C0.415685 9.38763 0.84181 9.42157 1.27586 9.42157Z"}" fill="${"currentColor"}" style="${"transform-origin: 40% 40%;"}"></path><path class="${"transition " + escape2(transitonDuration)}" transform="${"translate(8, 7.25) scale(" + escape2(isAuto ? 1 : 0) + ")"}" d="${"M1.2002 7.8L2 5.72051M6.8 7.8L6.00035 5.72051M2 5.72051H6.00035M2 5.72051L4.0002 1L6.00035 5.72051"}" stroke="${"currentColor"}" stroke-width="${"1.5"}" stroke-linecap="${"round"}" stroke-linejoin="${"round"}" style="${"transform-origin: 15% 25%"}"></path><path class="${"transition " + escape2(transitonDuration)}" transform="${"translate(" + escape2(isNight ? 2.5 : 0.5) + ", " + escape2(isNight ? 2.75 : 0.75) + ") scale(" + escape2(starScale) + ")"}" d="${"M1.88373 1.8487L2.76761 2.73258M3.65149 3.61646L2.76761 2.73258M3.75002 1.75002L2.76761 2.73258M2.76761 2.73258L1.75 3.75"}" stroke="${"currentColor"}" stroke-linecap="${"round"}" style="${"transform-origin: 11% 12%;"}"></path><path class="${"transition " + escape2(transitonDuration)}" transform="${"translate(" + escape2(isNight ? 5.5 : 3.5) + ", " + escape2(isNight ? 1.75 : 1.25) + ") scale(" + escape2(starScale) + ")"}" d="${"M7.53059 3.81382L6.90559 4.89635M6.28059 5.97889L6.90559 4.89635M8.10894 5.59099L6.90559 4.89635M6.90559 4.89635L5.65946 4.17675"}" stroke="${"currentColor"}" stroke-linecap="${"round"}" style="${"transform-origin: 29% 21%;"}"></path><path class="${"transition " + escape2(transitonDuration)}" transform="${"translate(" + escape2(isNight ? 4 : 3.5) + ", " + escape2(isNight ? 4.75 : 2.75) + ") scale(" + escape2(starScale) + ")"}" d="${"M2.69123 6.6485L2.90829 7.87951M3.12535 9.11052L2.90829 7.87951M4.27661 7.63813L2.90829 7.87951M2.90829 7.87951L1.49115 8.12926"}" stroke="${"currentColor"}" stroke-linecap="${"round"}" style="${"transform-origin: 12% 33%"}"></path><circle class="${"transition " + escape2(transitonDuration)}" transform="${"scale(" + escape2(isAuto ? 1 : 0.714) + ")"}" cx="${"12"}" cy="${"12"}" r="${"7"}" stroke="${"currentColor"}"${add_attribute("stroke-width", isAuto ? 1.5 : 2.1, 0)}${add_attribute("opacity", isDay || isAuto ? 1 : 0, 0)} style="${"transform-origin: center center"}"></circle></svg></button>`;
 });
 var css$3 = {
-  code: "li.svelte-1e7aig7.svelte-1e7aig7:not(.visible),li.svelte-1e7aig7.svelte-1e7aig7:not(:first-of-type):not(:nth-of-type(2)){display:none}@media(min-width:640px){li.svelte-1e7aig7.svelte-1e7aig7:not(:first-of-type):not(:nth-of-type(2)){display:block}}nav.svelte-1e7aig7 ul li.svelte-1e7aig7:not(:first-of-type){transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1)}nav.svelte-1e7aig7 ul li.svelte-1e7aig7:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(50,46,255,var(--tw-text-opacity))}@media(prefers-color-scheme:dark){nav.svelte-1e7aig7 ul li.svelte-1e7aig7:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(114,112,255,var(--tw-text-opacity))}}",
-  map: `{"version":3,"file":"Header.svelte","sources":["Header.svelte"],"sourcesContent":["<script>\\n\\timport { page } from '$app/stores';\\n\\timport Logo from '$lib/Logo.svelte';\\n<\/script>\\n\\n<header class=\\"h-80 sm:h-100 flex items-center px-30 sm:px-48 fixed top-0 left-0 right-0 bg-white bg-opacity-90 dark:bg-rich-purple-900 dark:bg-opacity-90 backdrop-blur-lg z-10\\">\\n\\t<nav class=\\"contained-width w-full xl:px-48 flex items-center justify-between\\">\\n\\t\\t<ul class=\\"flex items-center gap-30 text-16 w-max\\">\\n\\t\\t\\t<li class=\\"visible\\"><a sveltekit:prefetch href=\\"/\\" aria-label=\\"Go to homepage\\"><Logo color /></a></li>\\n\\t\\t\\t<li class:visible={$page.path !== '/'}><a sveltekit:prefetch href=\\"/\\">Back</a></li>\\n\\t\\t\\t<li class:visible={$page.path === '/'}><a sveltekit:prefetch href=\\"#about\\">About me</a></li>\\n\\t\\t\\t<li class:visible={$page.path === '/'}><a sveltekit:prefetch href=\\"#work\\">Work</a></li>\\n\\t\\t\\t<li class:visible={$page.path === '/'}><a sveltekit:prefetch href=\\"#contact\\">Contact</a></li>\\n\\t\\t</ul>\\n\\t\\t<button class=\\"flex sm:hidden\\">Menu</button>\\n\\t</nav>\\n</header>\\n\\n<style lang=\\"postcss\\">li:not(.visible),li:not(:first-of-type):not(:nth-of-type(2)){display:none}@media (min-width:640px){li:not(:first-of-type):not(:nth-of-type(2)){display:block}}nav ul li:not(:first-of-type){transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1)}nav ul li:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(50,46,255,var(--tw-text-opacity))}@media (prefers-color-scheme:dark){nav ul li:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(114,112,255,var(--tw-text-opacity))}}</style>"],"names":[],"mappings":"AAkBsB,gCAAE,KAAK,QAAQ,CAAC,CAAC,gCAAE,KAAK,cAAc,CAAC,KAAK,aAAa,CAAC,CAAC,CAAC,CAAC,QAAQ,IAAI,CAAC,MAAM,AAAC,WAAW,KAAK,CAAC,CAAC,gCAAE,KAAK,cAAc,CAAC,KAAK,aAAa,CAAC,CAAC,CAAC,CAAC,QAAQ,KAAK,CAAC,CAAC,kBAAG,CAAC,EAAE,CAAC,iBAAE,KAAK,cAAc,CAAC,CAAC,oBAAoB,IAAI,CAAC,oBAAoB,gBAAgB,CAAC,YAAY,CAAC,KAAK,CAAC,IAAI,CAAC,MAAM,CAAC,2BAA2B,aAAa,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC,CAAC,CAAC,kBAAG,CAAC,EAAE,CAAC,iBAAE,KAAK,cAAc,CAAC,MAAM,CAAC,kBAAkB,CAAC,CAAC,MAAM,KAAK,EAAE,CAAC,EAAE,CAAC,GAAG,CAAC,IAAI,iBAAiB,CAAC,CAAC,CAAC,MAAM,AAAC,sBAAsB,IAAI,CAAC,CAAC,kBAAG,CAAC,EAAE,CAAC,iBAAE,KAAK,cAAc,CAAC,MAAM,CAAC,kBAAkB,CAAC,CAAC,MAAM,KAAK,GAAG,CAAC,GAAG,CAAC,GAAG,CAAC,IAAI,iBAAiB,CAAC,CAAC,CAAC,CAAC"}`
+  code: "li.svelte-rdrpg4.svelte-rdrpg4:not(.logo),li.svelte-rdrpg4.svelte-rdrpg4:not(.visible){display:none}@media(min-width:640px){li.svelte-rdrpg4.svelte-rdrpg4:not(.logo){display:block}}li.active.svelte-rdrpg4.svelte-rdrpg4{color:rgba(50,46,255,var(--tw-text-opacity));pointer-events:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}li.active.svelte-rdrpg4.svelte-rdrpg4{--tw-text-opacity:1}nav.svelte-rdrpg4 ul li.svelte-rdrpg4:not(:first-of-type){transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1)}nav.svelte-rdrpg4 ul li.svelte-rdrpg4:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(50,46,255,var(--tw-text-opacity))}.dark nav.svelte-rdrpg4 ul li.svelte-rdrpg4:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(114,112,255,var(--tw-text-opacity))}",
+  map: `{"version":3,"file":"Header.svelte","sources":["Header.svelte"],"sourcesContent":["<script>\\n\\timport { page } from '$app/stores';\\n\\timport Logo from '$lib/Logo.svelte';\\n\\timport ThemePicker from './ThemePicker.svelte';\\n<\/script>\\n\\n<header\\n\\tclass=\\"h-80 sm:h-100 flex items-center px-30 sm:px-48 fixed top-0 left-0 right-0 bg-white bg-opacity-90 dark:bg-rich-purple-900 dark:bg-opacity-90 backdrop-blur-lg z-10\\"\\n>\\n\\t<nav class=\\"contained w-full xl:px-48 flex items-center justify-between\\">\\n\\t\\t<ul class=\\"flex items-center gap-30 text-16 w-max\\">\\n\\t\\t\\t<li class=\\"visible logo\\">\\n\\t\\t\\t\\t<a sveltekit:prefetch href=\\"/\\" aria-label=\\"Go to homepage\\"><Logo color /></a>\\n\\t\\t\\t</li>\\n\\n\\t\\t\\t<li class:active={$page.path === '/#about'}>\\n\\t\\t\\t\\t<a sveltekit:prefetch href=\\"/#about\\">About me</a>\\n\\t\\t\\t</li>\\n\\n\\t\\t\\t{#if $page.path === '/'}\\n\\t\\t\\t\\t<li class:active={$page.path === '/#work'}><a sveltekit:prefetch href=\\"#work\\">Work</a></li>\\n\\t\\t\\t{:else}\\n\\t\\t\\t\\t<li class:active={$page.path.startsWith('/work')}>\\n\\t\\t\\t\\t\\t<a sveltekit:prefetch href=\\"/work\\">Work</a>\\n\\t\\t\\t\\t</li>\\n\\t\\t\\t{/if}\\n\\n\\t\\t\\t<li><a sveltekit:prefetch href=\\"/#contact\\">Contact</a></li>\\n\\t\\t</ul>\\n\\n\\t\\t<ThemePicker />\\n\\t\\t<button class=\\"flex sm:hidden\\">Menu</button>\\n\\t</nav>\\n</header>\\n\\n<style lang=\\"postcss\\">li:not(.logo),li:not(.visible){display:none}@media (min-width:640px){li:not(.logo){display:block}}li.active{color:rgba(50,46,255,var(--tw-text-opacity));pointer-events:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.dark li.active,li.active{--tw-text-opacity:1}.dark li.active{color:rgba(114,112,255,var(--tw-text-opacity))}nav ul li:not(:first-of-type){transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1)}nav ul li:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(50,46,255,var(--tw-text-opacity))}.dark nav ul li:not(:first-of-type):hover{--tw-text-opacity:1;color:rgba(114,112,255,var(--tw-text-opacity))}</style>\\n"],"names":[],"mappings":"AAmCsB,8BAAE,KAAK,KAAK,CAAC,CAAC,8BAAE,KAAK,QAAQ,CAAC,CAAC,QAAQ,IAAI,CAAC,MAAM,AAAC,WAAW,KAAK,CAAC,CAAC,8BAAE,KAAK,KAAK,CAAC,CAAC,QAAQ,KAAK,CAAC,CAAC,EAAE,mCAAO,CAAC,MAAM,KAAK,EAAE,CAAC,EAAE,CAAC,GAAG,CAAC,IAAI,iBAAiB,CAAC,CAAC,CAAC,eAAe,IAAI,CAAC,oBAAoB,IAAI,CAAC,iBAAiB,IAAI,CAAC,gBAAgB,IAAI,CAAC,YAAY,IAAI,CAAC,AAAgB,EAAE,mCAAO,CAAC,kBAAkB,CAAC,CAAC,AAA+D,iBAAG,CAAC,EAAE,CAAC,gBAAE,KAAK,cAAc,CAAC,CAAC,oBAAoB,IAAI,CAAC,oBAAoB,gBAAgB,CAAC,YAAY,CAAC,KAAK,CAAC,IAAI,CAAC,MAAM,CAAC,2BAA2B,aAAa,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC,CAAC,CAAC,iBAAG,CAAC,EAAE,CAAC,gBAAE,KAAK,cAAc,CAAC,MAAM,CAAC,kBAAkB,CAAC,CAAC,MAAM,KAAK,EAAE,CAAC,EAAE,CAAC,GAAG,CAAC,IAAI,iBAAiB,CAAC,CAAC,CAAC,KAAK,CAAC,iBAAG,CAAC,EAAE,CAAC,gBAAE,KAAK,cAAc,CAAC,MAAM,CAAC,kBAAkB,CAAC,CAAC,MAAM,KAAK,GAAG,CAAC,GAAG,CAAC,GAAG,CAAC,IAAI,iBAAiB,CAAC,CAAC,CAAC"}`
 };
 var Header = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $page, $$unsubscribe_page;
   $$unsubscribe_page = subscribe(page, (value) => $page = value);
   $$result.css.add(css$3);
   $$unsubscribe_page();
-  return `<header class="${"h-80 sm:h-100 flex items-center px-30 sm:px-48 fixed top-0 left-0 right-0 bg-white bg-opacity-90 dark:bg-rich-purple-900 dark:bg-opacity-90 backdrop-blur-lg z-10"}"><nav class="${"contained-width w-full xl:px-48 flex items-center justify-between svelte-1e7aig7"}"><ul class="${"flex items-center gap-30 text-16 w-max"}"><li class="${"visible svelte-1e7aig7"}"><a sveltekit:prefetch href="${"/"}" aria-label="${"Go to homepage"}">${validate_component(Logo, "Logo").$$render($$result, { color: true }, {}, {})}</a></li>
-			<li class="${["svelte-1e7aig7", $page.path !== "/" ? "visible" : ""].join(" ").trim()}"><a sveltekit:prefetch href="${"/"}">Back</a></li>
-			<li class="${["svelte-1e7aig7", $page.path === "/" ? "visible" : ""].join(" ").trim()}"><a sveltekit:prefetch href="${"#about"}">About me</a></li>
-			<li class="${["svelte-1e7aig7", $page.path === "/" ? "visible" : ""].join(" ").trim()}"><a sveltekit:prefetch href="${"#work"}">Work</a></li>
-			<li class="${["svelte-1e7aig7", $page.path === "/" ? "visible" : ""].join(" ").trim()}"><a sveltekit:prefetch href="${"#contact"}">Contact</a></li></ul>
+  return `<header class="${"h-80 sm:h-100 flex items-center px-30 sm:px-48 fixed top-0 left-0 right-0 bg-white bg-opacity-90 dark:bg-rich-purple-900 dark:bg-opacity-90 backdrop-blur-lg z-10"}"><nav class="${"contained w-full xl:px-48 flex items-center justify-between svelte-rdrpg4"}"><ul class="${"flex items-center gap-30 text-16 w-max"}"><li class="${"visible logo svelte-rdrpg4"}"><a sveltekit:prefetch href="${"/"}" aria-label="${"Go to homepage"}">${validate_component(Logo, "Logo").$$render($$result, { color: true }, {}, {})}</a></li>
+
+			<li class="${["svelte-rdrpg4", $page.path === "/#about" ? "active" : ""].join(" ").trim()}"><a sveltekit:prefetch href="${"/#about"}">About me</a></li>
+
+			${$page.path === "/" ? `<li class="${["svelte-rdrpg4", $page.path === "/#work" ? "active" : ""].join(" ").trim()}"><a sveltekit:prefetch href="${"#work"}">Work</a></li>` : `<li class="${["svelte-rdrpg4", $page.path.startsWith("/work") ? "active" : ""].join(" ").trim()}"><a sveltekit:prefetch href="${"/work"}">Work</a></li>`}
+
+			<li class="${"svelte-rdrpg4"}"><a sveltekit:prefetch href="${"/#contact"}">Contact</a></li></ul>
+
+		${validate_component(ThemePicker, "ThemePicker").$$render($$result, {}, {}, {})}
 		<button class="${"flex sm:hidden"}">Menu</button></nav>
 </header>`;
 });
 var Footer = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  return `<footer class="${"border-t border-rich-purple-500 dark:border-rich-purple-300 border-opacity-5 dark:border-opacity-10 p-30 sm:px-60 sm:py-30 w-full"}"><div class="${"contained-width"}"><div class="${"flex items-center gap-5 text-18 flex-shrink-0 mb-15"}">${validate_component(Logo, "Logo").$$render($$result, { small: true }, {}, {})}
+  return `<footer class="${"border-t border-rich-purple-500 dark:border-rich-purple-300 border-opacity-5 dark:border-opacity-10 p-30 sm:px-60 sm:py-30 w-full"}"><div class="${"contained flex items-center justify-between"}"><div class="${"flex items-center gap-10 text-14 flex-shrink-0 mb-5 font-light"}">${validate_component(Logo, "Logo").$$render($$result, { small: true }, {}, {})}
         <span>\xA9 2021</span></div>
 
-    <p class="${"text-12 text-gray-800 dark:text-gray-300 font-light opacity-95 w-9/12 sm:w-full"}">Made with \u2764\uFE0F in <a href="${"https://www.figma.com/"}">Figma</a>, built using
+    <p class="${"text-right text-12 text-gray-800 dark:text-gray-300 font-light opacity-95 w-7/12 sm:w-full"}">Made with \u2764\uFE0F in <a href="${"https://www.figma.com/"}">Figma</a>, built using
         <a href="${"https://kit.svelte.dev"}">SvelteKit</a> and <a href="${"https://tailwindcss.com"}">TailwindCSS</a>, hosted on
         <a href="${"https://netlify.com"}">Netlify</a></p></div></footer>`;
 });
 var _layout = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let $$unsubscribe_preferences;
+  let $$unsubscribe_prefersColorSchemeDark;
+  let $$unsubscribe_page;
+  let $$unsubscribe_reducedMotion;
+  $$unsubscribe_preferences = subscribe(preferences, (value) => value);
+  $$unsubscribe_prefersColorSchemeDark = subscribe(prefersColorSchemeDark, (value) => value);
+  $$unsubscribe_page = subscribe(page, (value) => value);
+  $$unsubscribe_reducedMotion = subscribe(reducedMotion, (value) => value);
+  $$unsubscribe_preferences();
+  $$unsubscribe_prefersColorSchemeDark();
+  $$unsubscribe_page();
+  $$unsubscribe_reducedMotion();
   return `${validate_component(Header, "Header").$$render($$result, {}, {}, {})}
 
-<main class="${"contained-width grid grid-cols-[1.875rem,1fr,1.875rem] sm:grid-cols-[3rem,1fr,3rem]"}">${slots.default ? slots.default({}) : ``}</main>
-
-${validate_component(Footer, "Footer").$$render($$result, {}, {}, {})}`;
+<div><main class="${"contained grid grid-cols-[1.875rem,1fr,1.875rem] sm:grid-cols-[3rem,1fr,3rem]"}">${slots.default ? slots.default({}) : ``}</main>
+		${validate_component(Footer, "Footer").$$render($$result, {}, {}, {})}</div>`;
 });
 var __layout = /* @__PURE__ */ Object.freeze({
   __proto__: null,
@@ -2774,6 +5056,7 @@ var ArrowButton = create_ssr_component(($$result, $$props, $$bindings, slots) =>
   let { url } = $$props;
   let { extraClass = "" } = $$props;
   let { arrowDirection = ArrowDirections.RIGHT } = $$props;
+  let { external = false } = $$props;
   if ($$props.content === void 0 && $$bindings.content && content !== void 0)
     $$bindings.content(content);
   if ($$props.url === void 0 && $$bindings.url && url !== void 0)
@@ -2782,8 +5065,10 @@ var ArrowButton = create_ssr_component(($$result, $$props, $$bindings, slots) =>
     $$bindings.extraClass(extraClass);
   if ($$props.arrowDirection === void 0 && $$bindings.arrowDirection && arrowDirection !== void 0)
     $$bindings.arrowDirection(arrowDirection);
-  return `<a class="${"flex items-center text-14w uppercase font-medium gap-5 group w-max p-px rounded-sm " + escape2(extraClass)}"${add_attribute("href", url, 0)}><span class="${"group-hover:text-rich-purple-500 dark:group-hover:text-rich-purple-300 group-hover:tracking-[0.18em] transition-all"}"><!-- HTML_TAG_START -->${content}<!-- HTML_TAG_END --></span>
-    <svg class="${[
+  if ($$props.external === void 0 && $$bindings.external && external !== void 0)
+    $$bindings.external(external);
+  return `<a${add_attribute("rel", external ? "external" : "", 0)} class="${"flex items-center text-14w uppercase font-medium gap-5 group w-max p-px rounded-sm " + escape2(extraClass)}"${add_attribute("href", url, 0)}><span class="${"group-hover:text-rich-purple-500 dark:group-hover:text-rich-purple-300 group-hover:tracking-[0.18em] transition-all"}"><!-- HTML_TAG_START -->${content}<!-- HTML_TAG_END --></span>
+	<svg class="${[
     "transform",
     (arrowDirection === ArrowDirections.DIAGONAL ? "-rotate-45" : "") + " " + (arrowDirection === ArrowDirections.DOWN ? "rotate-90" : "") + " " + (arrowDirection === ArrowDirections.UP ? "-rotate-90" : "") + " " + (arrowDirection === ArrowDirections.LEFT ? "rotate-180" : "")
   ].join(" ").trim()}" width="${"16"}" height="${"16"}" viewBox="${"0 0 16 16"}" fill="${"none"}" xmlns="${"http://www.w3.org/2000/svg"}"><path d="${"M8.84 2l5.66 6-5.66 6-.973-1.031 4.005-4.232H1.5V7.263h10.372L7.867 3.018 8.84 2z"}" class="${"fill-rich-purple-500 dark:fill-rich-purple-300"}"></path></svg></a>`;
@@ -2797,11 +5082,18 @@ var AboutImage = create_ssr_component(($$result, $$props, $$bindings, slots) => 
   return `<svg width="${"785"}" height="${"566"}" viewBox="${"0 0 785 566"}" fill="${"none"}" xmlns="${"http://www.w3.org/2000/svg"}" xmlns:xlink="${"http://www.w3.org/1999/xlink"}" class="${"svelte-8vp0lw"}"><circle cx="${"62.5012"}" cy="${"79.5"}" r="${"54.5"}" transform="${"rotate(-9.17892 62.5012 79.5)"}" fill="${"url(#imgFill0)"}"></circle><circle cx="${"172.322"}" cy="${"277.32"}" r="${"34"}" transform="${"rotate(-14.244 172.322 277.32)"}" fill="${"url(#imgFill1)"}"></circle><circle cx="${"650"}" cy="${"297"}" r="${"34"}" transform="${"rotate(-19.6645 650 297)"}" fill="${"url(#imgFill2)"}"></circle><circle cx="${"420.502"}" cy="${"273.5"}" r="${"88.5"}" fill="${"url(#imgFill3)"}"></circle><circle cx="${"721.5"}" cy="${"70.5001"}" r="${"56.5"}" transform="${"rotate(6.69448 721.5 70.5001)"}" fill="${"url(#imgFill4)"}"></circle><circle cx="${"554.501"}" cy="${"503.5"}" r="${"62.5"}" fill="${"url(#imgFill5)"}"></circle><circle cx="${"157.5"}" cy="${"493.5"}" r="${"56.5"}" fill="${"url(#imgFill6)"}"></circle><circle cx="${"462.502"}" cy="${"34.5"}" r="${"34.5"}" fill="${"url(#imgFill7)"}"></circle><circle cx="${"344.117"}" cy="${"450.115"}" r="${"36.0472"}" transform="${"rotate(10.7041 344.117 450.115)"}" fill="${"url(#imgFill8)"}"></circle><circle cx="${"722.325"}" cy="${"437.325"}" r="${"26.5"}" transform="${"rotate(6.48841 722.325 437.325)"}" fill="${"url(#imgFill9)"}"></circle><circle cx="${"580.5"}" cy="${"144.5"}" r="${"30.326"}" transform="${"rotate(12.9617 580.5 144.5)"}" fill="${"url(#imgFill10)"}"></circle><circle cx="${"264.501"}" cy="${"126.5"}" r="${"35.1832"}" transform="${"rotate(-12.2032 264.501 126.5)"}" fill="${"url(#imgFill11)"}"></circle><circle cx="${"34.0707"}" cy="${"372.071"}" r="${"26.5"}" transform="${"rotate(8.3588 30.0707 372.071)"}" fill="${"url(#imgFill12)"}"></circle><defs><pattern id="${"imgFill0"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img0"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/js-light_NsS7e7h1iO.png"}"></image></pattern><pattern id="${"imgFill1"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img1"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/figma_NhfQvqQk9s.png"}"></image><image id="${"img1"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/figma_NhfQvqQk9s.png"}"></image></pattern><pattern id="${"imgFill2"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img2"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/work_SWEpk52-xk.png"}"></image><image id="${"img2"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/work_SWEpk52-xk.png"}"></image></pattern><pattern id="${"imgFill3"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img3"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/me_8_97RTibL3.png"}"></image><image id="${"img3"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/me_8_97RTibL3.png"}"></image></pattern><pattern id="${"imgFill4"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img4"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/city_bGlwgxsd7.png"}"></image><image id="${"img4"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/city_bGlwgxsd7.png"}"></image></pattern><pattern id="${"imgFill5"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img5"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/dog_jmLx-UJ0Qn.png"}"></image><image id="${"img5"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/dog_jmLx-UJ0Qn.png"}"></image></pattern><pattern id="${"imgFill6"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img6"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/coffee_Az-P5TG4TO.png"}"></image><image id="${"img6"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/coffee_Az-P5TG4TO.png"}"></image></pattern><pattern id="${"imgFill7"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img7"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/wordpress_CL23aAT88.png"}"></image><image id="${"img7"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/wordpress_CL23aAT88.png"}"></image></pattern><pattern id="${"imgFill8"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img8"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/svelte_hiH-1myDZrb.png"}"></image><image id="${"img8"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/svelte_hiH-1myDZrb.png"}"></image></pattern><pattern id="${"imgFill9"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img9"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/indesign_v9_etFN4N.png"}"></image><image id="${"img9"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/indesign_v9_etFN4N.png"}"></image></pattern><pattern id="${"imgFill10"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img10"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/android_hD0IP-0hc5.png"}"></image><image id="${"img10"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/android_hD0IP-0hc5.png"}"></image></pattern><pattern id="${"imgFill11"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img11"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/airplane_9HO0AsWwb.png"}"></image><image id="${"img11"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/airplane_9HO0AsWwb.png"}"></image></pattern><pattern id="${"imgFill12"}" patternContentUnits="${"objectBoundingBox"}" width="${"1"}" height="${"1"}"><image id="${"img12"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/photoshop_6Hh47E7c-.png"}"></image><image id="${"img12"}" width="${"1"}" height="${"1"}" xlink:href="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/photoshop_6Hh47E7c-.png"}"></image></pattern></defs></svg>`;
 });
 var css$1 = {
-  code: "h3.svelte-11i2xf9{color:currentColor}@media(min-width:1024px){h3.svelte-11i2xf9{color:var(--light-color,currentColor)}@media(prefers-color-scheme:dark){h3.svelte-11i2xf9{--tw-text-opacity:1;color:rgba(255,255,255,var(--tw-text-opacity))}}}",
-  map: '{"version":3,"file":"WorkShowcaseCard.svelte","sources":["WorkShowcaseCard.svelte"],"sourcesContent":["<script>\\r\\n\\texport let imageFilename;\\r\\n\\texport let imageFormat = \'png\';\\r\\n\\texport let name;\\r\\n\\texport let url;\\r\\n\\texport let lightColor = \'white\';\\r\\n\\texport let desktopTextHorAlignEnd = false;\\r\\n\\texport let desktopTextVerAlignBottom = false;\\r\\n    export let extraClass = \'\';\\r\\n\\r\\n    const dHor = desktopTextHorAlignEnd ? \'lg:justify-self-end\' : \'lg:justify-self-start\';\\r\\n    const dVer = desktopTextVerAlignBottom ? \'lg:self-end\' : \'lg:self-start\';\\r\\n\\r\\n\\tconst baseUrl = \'https://ik.imagekit.io/goranalkovic/personal_web/homepage/projects/tr:n-home_workcard\';\\r\\n\\tconst mobileImageUrl = `${baseUrl}/${imageFilename}-mobile-light.${imageFormat}`;\\r\\n\\tconst imageUrl = `${baseUrl}/${imageFilename}-light.${imageFormat}`;\\r\\n\\tconst darkMobileImageUrl = `${baseUrl}/${imageFilename}-mobile-dark.${imageFormat}`;\\r\\n\\tconst darkImageUrl = `${baseUrl}/${imageFilename}-dark.${imageFormat}`;\\r\\n\\r\\n<\/script>\\r\\n\\r\\n<a href={url} class=\\"rounded-xl flex flex-col lg:grid lg:grid-cols-1 lg:grid-rows-1 transform-gpu hover:scale-[1.01] transition {extraClass}\\" style=\\"--light-color: {lightColor};\\">\\r\\n\\t<picture class=\\"lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1\\">\\r\\n        <source srcset={darkMobileImageUrl} media=\\"(prefers-color-scheme: dark) and (max-width: 1023px)\\" />\\r\\n\\t\\t<source srcset={mobileImageUrl} media=\\"(max-width: 1023px)\\" />\\r\\n\\t\\t<source srcset={darkImageUrl} media=\\"(prefers-color-scheme: dark) and (min-width: 1024px)\\" />\\r\\n\\t\\t<img class=\\"rounded-xl w-full h-full md:h-300 lg:h-full object-cover\\" src={imageUrl} alt={name} />\\r\\n\\t</picture>\\r\\n\\t<h3\\r\\n\\t\\tclass=\\"mt-15 lg:mt-0 mb-30 sm:mb-0 text-18 md:text-24 lg:text-48 font-medium lg:font-bold lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1 {dVer} {dHor} lg:p-20 transition-colors\\"\\r\\n\\t>\\r\\n\\t\\t{name}\\r\\n\\t</h3>\\r\\n</a>\\r\\n\\r\\n<style lang=\\"postcss\\">h3{color:currentColor}@media (min-width:1024px){h3{color:var(--light-color,currentColor)}@media (prefers-color-scheme:dark){h3{--tw-text-opacity:1;color:rgba(255,255,255,var(--tw-text-opacity))}}}</style>"],"names":[],"mappings":"AAmCsB,iBAAE,CAAC,MAAM,YAAY,CAAC,MAAM,AAAC,WAAW,MAAM,CAAC,CAAC,iBAAE,CAAC,MAAM,IAAI,aAAa,CAAC,YAAY,CAAC,CAAC,MAAM,AAAC,sBAAsB,IAAI,CAAC,CAAC,iBAAE,CAAC,kBAAkB,CAAC,CAAC,MAAM,KAAK,GAAG,CAAC,GAAG,CAAC,GAAG,CAAC,IAAI,iBAAiB,CAAC,CAAC,CAAC,CAAC,CAAC"}'
+  code: "h3.svelte-119otmt{color:currentColor}@media(min-width:1024px){h3.svelte-119otmt{color:var(--work-showcase-text-color,currentColor)}}",
+  map: '{"version":3,"file":"WorkShowcaseCard.svelte","sources":["WorkShowcaseCard.svelte"],"sourcesContent":["<script>\\r\\n\\timport { preferences, prefersColorSchemeDark, ThemeMode } from \'../stores\';\\r\\n\\r\\n\\texport let imageFilename;\\r\\n\\texport let imageFormat = \'png\';\\r\\n\\texport let name;\\r\\n\\texport let url;\\r\\n\\texport let lightColor = \'white\';\\r\\n\\texport let desktopTextHorAlignEnd = false;\\r\\n\\texport let desktopTextVerAlignBottom = false;\\r\\n\\texport let extraClass = \'\';\\r\\n\\r\\n\\tconst dHor = desktopTextHorAlignEnd ? \'lg:justify-self-end\' : \'lg:justify-self-start\';\\r\\n\\tconst dVer = desktopTextVerAlignBottom ? \'lg:self-end\' : \'lg:self-start\';\\r\\n\\r\\n\\tconst baseUrl =\\r\\n\\t\\t\'https://ik.imagekit.io/goranalkovic/personal_web/homepage/projects/tr:n-home_workcard\';\\r\\n\\tconst mobileImageUrl = `${baseUrl}/${imageFilename}-mobile-light.${imageFormat}`;\\r\\n\\tconst imageUrl = `${baseUrl}/${imageFilename}-light.${imageFormat}`;\\r\\n\\tconst darkMobileImageUrl = `${baseUrl}/${imageFilename}-mobile-dark.${imageFormat}`;\\r\\n\\tconst darkImageUrl = `${baseUrl}/${imageFilename}-dark.${imageFormat}`;\\r\\n\\r\\n\\t$: shouldBeDark =\\r\\n\\t\\t($preferences.theme === ThemeMode.AUTO && $prefersColorSchemeDark) ||\\r\\n\\t\\t$preferences.theme === ThemeMode.DARK;\\r\\n\\t$: mobileImage = shouldBeDark ? darkMobileImageUrl : mobileImageUrl;\\r\\n\\t$: desktopImage = shouldBeDark ? darkImageUrl : imageUrl;\\r\\n<\/script>\\r\\n\\r\\n<a\\r\\n\\thref={url}\\r\\n\\tclass=\\"rounded-xl flex flex-col lg:grid lg:grid-cols-1 lg:grid-rows-1 transform-gpu hover:scale-[1.01] transition {extraClass}\\"\\r\\n\\tstyle=\\"--work-showcase-text-color: {shouldBeDark ? \'#fff\' : lightColor};\\"\\r\\n>\\r\\n\\t<picture class=\\"lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1\\">\\r\\n\\t\\t<source srcset={mobileImage} media=\\"(max-width: 1023px)\\" />\\r\\n\\t\\t<img\\r\\n\\t\\t\\tclass=\\"rounded-xl w-full h-full md:h-300 lg:h-full object-cover\\"\\r\\n\\t\\t\\tsrc={desktopImage}\\r\\n\\t\\t\\talt={name}\\r\\n\\t\\t/>\\r\\n\\t</picture>\\r\\n\\t<h3\\r\\n\\t\\tclass=\\"mt-15 lg:mt-0 mb-30 sm:mb-0 text-18 md:text-24 lg:text-48 font-medium lg:font-bold lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1 {dVer} {dHor} lg:p-20 transition-colors\\"\\r\\n\\t>\\r\\n\\t\\t{name}\\r\\n\\t</h3>\\r\\n</a>\\r\\n\\r\\n<style lang=\\"postcss\\">h3{color:currentColor}@media (min-width:1024px){h3{color:var(--work-showcase-text-color,currentColor)}}</style>\\r\\n"],"names":[],"mappings":"AAiDsB,iBAAE,CAAC,MAAM,YAAY,CAAC,MAAM,AAAC,WAAW,MAAM,CAAC,CAAC,iBAAE,CAAC,MAAM,IAAI,0BAA0B,CAAC,YAAY,CAAC,CAAC,CAAC"}'
 };
 var baseUrl = "https://ik.imagekit.io/goranalkovic/personal_web/homepage/projects/tr:n-home_workcard";
 var WorkShowcaseCard = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let shouldBeDark;
+  let mobileImage;
+  let desktopImage;
+  let $preferences, $$unsubscribe_preferences;
+  let $prefersColorSchemeDark, $$unsubscribe_prefersColorSchemeDark;
+  $$unsubscribe_preferences = subscribe(preferences, (value) => $preferences = value);
+  $$unsubscribe_prefersColorSchemeDark = subscribe(prefersColorSchemeDark, (value) => $prefersColorSchemeDark = value);
   let { imageFilename } = $$props;
   let { imageFormat = "png" } = $$props;
   let { name } = $$props;
@@ -2833,11 +5125,14 @@ var WorkShowcaseCard = create_ssr_component(($$result, $$props, $$bindings, slot
   if ($$props.extraClass === void 0 && $$bindings.extraClass && extraClass !== void 0)
     $$bindings.extraClass(extraClass);
   $$result.css.add(css$1);
-  return `<a${add_attribute("href", url, 0)} class="${"rounded-xl flex flex-col lg:grid lg:grid-cols-1 lg:grid-rows-1 transform-gpu hover:scale-[1.01] transition " + escape2(extraClass)}" style="${"--light-color: " + escape2(lightColor) + ";"}"><picture class="${"lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1"}"><source${add_attribute("srcset", darkMobileImageUrl, 0)} media="${"(prefers-color-scheme: dark) and (max-width: 1023px)"}">
-		<source${add_attribute("srcset", mobileImageUrl, 0)} media="${"(max-width: 1023px)"}">
-		<source${add_attribute("srcset", darkImageUrl, 0)} media="${"(prefers-color-scheme: dark) and (min-width: 1024px)"}">
-		<img class="${"rounded-xl w-full h-full md:h-300 lg:h-full object-cover"}"${add_attribute("src", imageUrl, 0)}${add_attribute("alt", name, 0)}></picture>
-	<h3 class="${"mt-15 lg:mt-0 mb-30 sm:mb-0 text-18 md:text-24 lg:text-48 font-medium lg:font-bold lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1 " + escape2(dVer) + " " + escape2(dHor) + " lg:p-20 transition-colors svelte-11i2xf9"}">${escape2(name)}</h3>
+  shouldBeDark = $preferences.theme === ThemeMode.AUTO && $prefersColorSchemeDark || $preferences.theme === ThemeMode.DARK;
+  mobileImage = shouldBeDark ? darkMobileImageUrl : mobileImageUrl;
+  desktopImage = shouldBeDark ? darkImageUrl : imageUrl;
+  $$unsubscribe_preferences();
+  $$unsubscribe_prefersColorSchemeDark();
+  return `<a${add_attribute("href", url, 0)} class="${"rounded-xl flex flex-col lg:grid lg:grid-cols-1 lg:grid-rows-1 transform-gpu hover:scale-[1.01] transition " + escape2(extraClass)}" style="${"--work-showcase-text-color: " + escape2(shouldBeDark ? "#fff" : lightColor) + ";"}"><picture class="${"lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1"}"><source${add_attribute("srcset", mobileImage, 0)} media="${"(max-width: 1023px)"}">
+		<img class="${"rounded-xl w-full h-full md:h-300 lg:h-full object-cover"}"${add_attribute("src", desktopImage, 0)}${add_attribute("alt", name, 0)}></picture>
+	<h3 class="${"mt-15 lg:mt-0 mb-30 sm:mb-0 text-18 md:text-24 lg:text-48 font-medium lg:font-bold lg:row-start-1 lg:row-end-1 lg:col-start-1 lg:col-end-1 " + escape2(dVer) + " " + escape2(dHor) + " lg:p-20 transition-colors svelte-119otmt"}">${escape2(name)}</h3>
 </a>`;
 });
 var ContactItem = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -2856,28 +5151,28 @@ var ContactItem = create_ssr_component(($$result, $$props, $$bindings, slots) =>
     $$bindings.buttonCaption(buttonCaption);
   if ($$props.buttonUrl === void 0 && $$bindings.buttonUrl && buttonUrl !== void 0)
     $$bindings.buttonUrl(buttonUrl);
-  return `<div><p class="${"text-18 font-bold"}">${escape2(title)}</p>
-    <p class="${"text-14"}"><span>${escape2(contactPrefix)}</span><span class="${"text-rich-purple-500 dark:text-rich-purple-300"}">${escape2(contact)}</span></p>
+  return `<div><p class="${"text-18 font-bold transition-colors"}">${escape2(title)}</p>
+    <p class="${"text-14 transition-colors"}"><span>${escape2(contactPrefix)}</span><span class="${"text-rich-purple-500 dark:text-rich-purple-300"}">${escape2(contact)}</span></p>
 
     ${validate_component(ArrowButton, "ArrowButton").$$render($$result, {
+    external: true,
     url: buttonUrl,
     content: buttonCaption,
     extraClass: "mt-15"
   }, {}, {})}</div>`;
 });
 var css = {
-  code: "section.svelte-15brwd.svelte-15brwd{padding-bottom:3.75rem;padding-top:7.5rem}@media(min-width:768px){section.svelte-15brwd.svelte-15brwd{padding-bottom:3.75rem;padding-top:11.25rem}}#about.svelte-15brwd p.svelte-15brwd{font-size:.875rem;line-height:1.5}@media(min-width:768px){#about.svelte-15brwd p.svelte-15brwd{font-size:1.125rem;line-height:1.5}}a.underline.svelte-15brwd.svelte-15brwd{-webkit-text-decoration-color:#322eff;text-decoration-color:#322eff;text-decoration-thickness:2px;text-underline-offset:.1em}@media(prefers-color-scheme:dark){a.underline.svelte-15brwd.svelte-15brwd{-webkit-text-decoration-color:#7270ff;text-decoration-color:#7270ff}}",
-  map: `{"version":3,"file":"index.svelte","sources":["index.svelte"],"sourcesContent":["<script>\\n\\timport ArrowButton, { ArrowDirections } from '$lib/ArrowButton.svelte';\\n\\timport AboutImage from '$lib/AboutImage.svelte';\\n\\timport WorkShowcaseCard from '$lib/WorkShowcaseCard.svelte';\\n\\timport ContactItem from '$lib/ContactItem.svelte';\\n<\/script>\\n\\n<svelte:head>\\n\\t<title>Goran Alkovi\u0107 - Developer & designer</title>\\n\\t<meta\\n\\t\\tname=\\"description\\"\\n\\t\\tcontent=\\"Goran Alkovi\u0107 - a frontend developer that also likes to design.\\"\\n\\t/>\\n</svelte:head>\\n\\n<section id=\\"intro\\" class=\\"content-padding h-[90vh] !py-0 flex flex-col justify-center\\">\\n\\t<h1 class=\\"max-w-[68rem]\\">\\n\\t\\t<span class=\\"text-transparent text-stroke-1 text-stroke-black dark:text-stroke-white\\">\\n\\t\\t\\tHi! I'm Goran.\\n\\t\\t</span>\\n\\t\\t<br />\\n\\t\\tA <span class=\\"purple-text\\">frontend developer</span> that also likes to design.\\n\\t</h1>\\n\\n\\t<ArrowButton\\n\\t\\tcontent=\\"Learn more about me\\"\\n\\t\\turl=\\"#about\\"\\n\\t\\tarrowDirection={ArrowDirections.DOWN}\\n\\t\\textraClass=\\"mt-30 md:mt-60\\"\\n\\t/>\\n</section>\\n\\n<section class=\\"content-padding lg:flex lg:flex-row-reverse md:col-start-2 md:col-span-2\\" id=\\"about\\">\\n\\t<AboutImage />\\n\\t<div class=\\"flex flex-col gap-15 max-w-lg lg:max-w-420 md:mr-px mt-30 sm:mt-60 lg:mt-0 lg:mr-30\\">\\n\\t\\t<h2><span class=\\"purple-text\\">About</span> me</h2>\\n\\t\\t<p>\\n\\t\\t\\tI\u2019m a frontend developer who also likes to design. My philosophy is that everything should be\\n\\t\\t\\tvisually pleasing and easy to use, besides just doing its job.\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tThroughout the years I tried a lot of technologies and fields in development, but what won at\\n\\t\\t\\tthe end was web development (mostly frontend).\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tDesign-wise I\u2019ve done some print design, but mostly I\u2019ve worked on digital design and UI/UX\\n\\t\\t\\tfor my personal projects.\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tCurrently working at <a class=\\"underline \\" href=\\"https://infinum.com\\">Infinum</a> as a WordPress\\n\\t\\t\\tengineer, where I create custom Gutenberg block themes and work on the open-source Eightshift boilerplate.\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tIn my free time I love to drink coffee, explore what\u2019s new in tech, make crazy projects and\\n\\t\\t\\tgame a bit here and there.\\n\\t\\t</p>\\n\\t\\t<ArrowButton content=\\"Read my CV\\" url=\\"/about\\" extraClass=\\"mt-15 md:mt-30\\" />\\n\\t\\t<ArrowButton\\n\\t\\t\\tcontent=\\"Explore my work\\"\\n\\t\\t\\turl=\\"#work\\"\\n\\t\\t\\textraClass=\\"mt-15\\"\\n\\t\\t\\tarrowDirection={ArrowDirections.DOWN}\\n\\t\\t/>\\n\\t</div>\\n</section>\\n\\n<section class=\\"content-padding\\" id=\\"work\\">\\n\\t\\n\\n\\t<div class=\\"sm:grid sm:grid-cols-2 sm:gap-15 md:gap-30 lg:grid-rows-[min,1fr,1fr,6rem]\\">\\n\\t\\t<h2 class=\\"mb-30 sm:mb-15 md:mb-0 sm:col-span-2 lg:col-span-1\\">Some of my <span class=\\"purple-text\\">work</span></h2>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"Goc's recipe book\\"\\n\\t\\t\\turl=\\"https://recipes.goranalkovic.com\\"\\n\\t\\t\\timageFilename=\\"recipes\\"\\n\\t\\t\\tdesktopTextVerAlignBottom\\n\\t\\t\\textraClass=\\"lg:col-start-2 lg:row-start-1 lg:row-span-2\\"\\n\\t\\t\\tlightColor=\\"#CE0F4C\\"\\n\\t\\t/>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"SocialByte\\"\\n\\t\\t\\turl=\\"https://socialbyte.agency\\"\\n\\t\\t\\timageFilename=\\"socialbyte\\"\\n\\t\\t\\tdesktopTextHorAlignEnd\\n\\t\\t\\tdesktopTextVerAlignBottom\\n\\t\\t/>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"STEM Games 2019\\"\\n\\t\\t\\turl=\\"#\\"\\n\\t\\t\\timageFilename=\\"stemgames\\"\\n\\t\\t\\tdesktopTextHorAlignEnd\\n\\t\\t\\textraClass=\\"md:row-span-2\\"\\n\\t\\t\\tlightColor=\\"#06354A\\"\\n\\t\\t/>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"Browser piano\\"\\n\\t\\t\\turl=\\"https://piano.goranalkovic.com\\"\\n\\t\\t\\timageFilename=\\"piano\\"\\n\\t\\t/>\\n\\t\\t<ArrowButton\\n\\t\\tcontent=\\"See more\\"\\n\\t\\turl=\\"#\\"\\n\\t\\textraClass=\\"mt-15 sm:mt-30 md:mt-0 sm:col-start-1 lg:col-start-2 sm:!w-full h-full lg:justify-center rounded-md lg:border lg:border-gray-200 lg:hover:border-rich-purple-500 lg:hover:border-opacity-50 lg:dark:border-rich-purple-300 lg:dark:border-opacity-10 lg:dark:hover:border-opacity-50 lg:dark:hover:border-rich-purple-300 !transition\\"\\n\\t\\t/>\\n\\t</div>\\n</section>\\n\\n<section id=\\"contact\\" class=\\"content-padding mb-[20vh]\\">\\n\\t<h2><span class=\\"purple-text\\">Contact</span> & socials</h2>\\n\\n\\t<div\\n\\t\\tclass=\\"flex flex-col gap-30 mt-30 sm:mt-60 md:grid md:grid-cols-2 lg:grid-rows-2 lg:auto-cols-fr lg:grid-flow-col md:gap-x-30 md:gap-y-48 lg:gap-y-60 w-full\\"\\n\\t>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"E-mail\\"\\n\\t\\t\\tcontact=\\"contact@goranalkovic.com\\"\\n\\t\\t\\tbuttonCaption=\\"Send an email\\"\\n\\t\\t\\tbuttonUrl=\\"mailto:contact@goranalkovic.com\\"\\n\\t\\t/>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"Phone\\"\\n\\t\\t\\tcontactPrefix=\\"+385 \\"\\n\\t\\t\\tcontact=\\"976 480 800\\"\\n\\t\\t\\tbuttonCaption=\\"Open in dialer\\"\\n\\t\\t\\tbuttonUrl=\\"tel:+385976480800\\"\\n\\t\\t/>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"GitHub\\"\\n\\t\\t\\tcontactPrefix=\\"github.com/\\"\\n\\t\\t\\tcontact=\\"goranalkovic\\"\\n\\t\\t\\tbuttonCaption=\\"View my repos\\"\\n\\t\\t\\tbuttonUrl=\\"https://github.com/goranalkovic\\"\\n\\t\\t/>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"LinkedIn\\"\\n\\t\\t\\tcontactPrefix=\\"linkedin.com/in/\\"\\n\\t\\t\\tcontact=\\"goran-alkovi\u0107-b9569379\\"\\n\\t\\t\\tbuttonCaption=\\"Connect with me\\"\\n\\t\\t\\tbuttonUrl=\\"https://www.linkedin.com/in/goran-alkovi%C4%87-b9569379\\"\\n\\t\\t/>\\n\\t\\t<div class=\\"lg:row-span-2\\">\\n\\t\\t\\t<ContactItem\\n\\t\\t\\t\\ttitle=\\"Unsplash\\"\\n\\t\\t\\t\\tcontactPrefix=\\"unsplash.com/\\"\\n\\t\\t\\t\\tcontact=\\"@goran_alkovic\\"\\n\\t\\t\\t\\tbuttonCaption=\\"Explore my photos\\"\\n\\t\\t\\t\\tbuttonUrl=\\"https://unsplash.com/@goran_alkovic\\"\\n\\t\\t\\t/>\\n\\t\\t</div>\\n\\t</div>\\n</section>\\n\\n<style lang=\\"postcss\\">section{padding-bottom:3.75rem;padding-top:7.5rem}@media (min-width:768px){section{padding-bottom:3.75rem;padding-top:11.25rem}}#about p{font-size:.875rem;line-height:1.5}@media (min-width:768px){#about p{font-size:1.125rem;line-height:1.5}}a.underline{-webkit-text-decoration-color:#322eff;text-decoration-color:#322eff;text-decoration-thickness:2px;text-underline-offset:.1em}@media (prefers-color-scheme:dark){a.underline{-webkit-text-decoration-color:#7270ff;text-decoration-color:#7270ff}}</style>\\n"],"names":[],"mappings":"AAwJsB,mCAAO,CAAC,eAAe,OAAO,CAAC,YAAY,MAAM,CAAC,MAAM,AAAC,WAAW,KAAK,CAAC,CAAC,mCAAO,CAAC,eAAe,OAAO,CAAC,YAAY,QAAQ,CAAC,CAAC,oBAAM,CAAC,eAAC,CAAC,UAAU,OAAO,CAAC,YAAY,GAAG,CAAC,MAAM,AAAC,WAAW,KAAK,CAAC,CAAC,oBAAM,CAAC,eAAC,CAAC,UAAU,QAAQ,CAAC,YAAY,GAAG,CAAC,CAAC,CAAC,sCAAU,CAAC,8BAA8B,OAAO,CAAC,sBAAsB,OAAO,CAAC,0BAA0B,GAAG,CAAC,sBAAsB,IAAI,CAAC,MAAM,AAAC,sBAAsB,IAAI,CAAC,CAAC,CAAC,sCAAU,CAAC,8BAA8B,OAAO,CAAC,sBAAsB,OAAO,CAAC,CAAC"}`
+  code: "section.svelte-ye5pxv.svelte-ye5pxv{padding-bottom:3.75rem;padding-top:7.5rem}@media(min-width:768px){section.svelte-ye5pxv.svelte-ye5pxv{padding-bottom:3.75rem;padding-top:11.25rem}}#about.svelte-ye5pxv p.svelte-ye5pxv{font-size:.875rem;line-height:1.5;transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1)}@media(min-width:768px){#about.svelte-ye5pxv p.svelte-ye5pxv{font-size:1.125rem;line-height:1.5}}",
+  map: `{"version":3,"file":"index.svelte","sources":["index.svelte"],"sourcesContent":["<script>\\n\\timport ArrowButton, { ArrowDirections } from '$lib/ArrowButton.svelte';\\n\\timport AboutImage from '$lib/AboutImage.svelte';\\n\\timport WorkShowcaseCard from '$lib/WorkShowcaseCard.svelte';\\n\\timport ContactItem from '$lib/ContactItem.svelte';\\n<\/script>\\n\\n<svelte:head>\\n\\t<title>Goran Alkovi\u0107 | Developer & designer</title>\\n\\t<meta\\n\\t\\tname=\\"description\\"\\n\\t\\tcontent=\\"Goran Alkovi\u0107 - a frontend developer that also likes to design.\\"\\n\\t/>\\n</svelte:head>\\n\\n<section id=\\"intro\\" class=\\"content-padding h-[90vh] !py-0 flex flex-col justify-center\\">\\n\\t<h1 class=\\"max-w-[68rem]\\">\\n\\t\\t<span class=\\"block text-transparent text-stroke-1 text-stroke-black dark:text-stroke-white\\">\\n\\t\\t\\tHi! I'm Goran.\\n\\t\\t</span>\\n\\t\\t<span class=\\"block\\">\\n\\t\\t\\tA <span class=\\"purple-text\\">frontend developer</span> that also likes to design.\\n\\t\\t</span>\\n\\t</h1>\\n\\n\\t<ArrowButton\\n\\t\\tcontent=\\"Learn more about me\\"\\n\\t\\turl=\\"#about\\"\\n\\t\\tarrowDirection={ArrowDirections.DOWN}\\n\\t\\textraClass=\\"mt-30 md:mt-60\\"\\n\\t/>\\n</section>\\n\\n<section\\n\\tclass=\\"content-padding lg:flex lg:flex-row-reverse md:col-start-2 md:col-span-2\\"\\n\\tid=\\"about\\"\\n>\\n\\t<AboutImage />\\n\\t<div class=\\"flex flex-col gap-15 max-w-lg lg:max-w-420 md:mr-px mt-30 sm:mt-60 lg:mt-0 lg:mr-30\\">\\n\\t\\t<h2><span class=\\"purple-text\\">About</span> me</h2>\\n\\t\\t<p>\\n\\t\\t\\tI\u2019m a frontend developer who also likes to design. My philosophy is that everything should be\\n\\t\\t\\tvisually pleasing and easy to use, besides just doing its job.\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tThroughout the years I tried a lot of technologies and fields in development, but what won at\\n\\t\\t\\tthe end was web development (mostly frontend).\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tDesign-wise I\u2019ve done some print design, but mostly I\u2019ve worked on digital design and UI/UX\\n\\t\\t\\tfor my personal projects.\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tCurrently working at <a class=\\"underline \\" href=\\"https://infinum.com\\">Infinum</a> as a WordPress\\n\\t\\t\\tengineer, where I create custom Gutenberg block themes and work on the open-source Eightshift boilerplate.\\n\\t\\t</p>\\n\\t\\t<p>\\n\\t\\t\\tIn my free time I love to drink coffee, explore what\u2019s new in tech, make crazy projects and\\n\\t\\t\\tgame a bit here and there.\\n\\t\\t</p>\\n\\t\\t<ArrowButton content=\\"Read my CV\\" url=\\"/about\\" extraClass=\\"mt-15 md:mt-30\\" />\\n\\t\\t<ArrowButton\\n\\t\\t\\tcontent=\\"Explore my work\\"\\n\\t\\t\\turl=\\"#work\\"\\n\\t\\t\\textraClass=\\"mt-15\\"\\n\\t\\t\\tarrowDirection={ArrowDirections.DOWN}\\n\\t\\t/>\\n\\t</div>\\n</section>\\n\\n<section class=\\"content-padding\\" id=\\"work\\">\\n\\t<div class=\\"sm:grid sm:grid-cols-2 sm:gap-15 md:gap-30 lg:grid-rows-[min,1fr,1fr,6rem]\\">\\n\\t\\t<h2 class=\\"mb-30 sm:mb-15 md:mb-0 sm:col-span-2 lg:col-span-1\\">\\n\\t\\t\\tSome of my <span class=\\"purple-text\\">work</span>\\n\\t\\t</h2>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"Goc's recipe book\\"\\n\\t\\t\\turl=\\"https://recipes.goranalkovic.com\\"\\n\\t\\t\\timageFilename=\\"recipes\\"\\n\\t\\t\\tdesktopTextVerAlignBottom\\n\\t\\t\\textraClass=\\"lg:col-start-2 lg:row-start-1 lg:row-span-2\\"\\n\\t\\t\\tlightColor=\\"#CE0F4C\\"\\n\\t\\t/>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"SocialByte\\"\\n\\t\\t\\turl=\\"https://socialbyte.agency\\"\\n\\t\\t\\timageFilename=\\"socialbyte\\"\\n\\t\\t\\tdesktopTextHorAlignEnd\\n\\t\\t\\tdesktopTextVerAlignBottom\\n\\t\\t/>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"STEM Games 2019\\"\\n\\t\\t\\turl=\\"#\\"\\n\\t\\t\\timageFilename=\\"stemgames\\"\\n\\t\\t\\tdesktopTextHorAlignEnd\\n\\t\\t\\textraClass=\\"md:row-span-2\\"\\n\\t\\t\\tlightColor=\\"#06354A\\"\\n\\t\\t/>\\n\\t\\t<WorkShowcaseCard\\n\\t\\t\\tname=\\"Browser piano\\"\\n\\t\\t\\turl=\\"https://piano.goranalkovic.com\\"\\n\\t\\t\\timageFilename=\\"piano\\"\\n\\t\\t/>\\n\\t\\t<ArrowButton\\n\\t\\t\\tcontent=\\"See more\\"\\n\\t\\t\\turl=\\"/work\\"\\n\\t\\t\\textraClass=\\"mt-15 sm:mt-30 md:mt-0 sm:col-start-1 lg:col-start-2 sm:!w-full h-full lg:justify-center rounded-md lg:border lg:border-gray-200 lg:hover:border-rich-purple-500 lg:hover:border-opacity-50 lg:dark:border-rich-purple-300 lg:dark:border-opacity-10 lg:dark:hover:border-opacity-50 lg:dark:hover:border-rich-purple-300 !transition\\"\\n\\t\\t/>\\n\\t</div>\\n</section>\\n\\n<section id=\\"contact\\" class=\\"content-padding mb-[20vh]\\">\\n\\t<h2><span class=\\"purple-text\\">Contact</span> & socials</h2>\\n\\n\\t<div\\n\\t\\tclass=\\"flex flex-col gap-30 mt-30 sm:mt-60 md:grid md:grid-cols-2 lg:grid-rows-2 lg:auto-cols-fr lg:grid-flow-col md:gap-x-30 md:gap-y-48 lg:gap-y-60 w-full\\"\\n\\t>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"E-mail\\"\\n\\t\\t\\tcontact=\\"contact@goranalkovic.com\\"\\n\\t\\t\\tbuttonCaption=\\"Send an email\\"\\n\\t\\t\\tbuttonUrl=\\"mailto:contact@goranalkovic.com\\"\\n\\t\\t/>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"Phone\\"\\n\\t\\t\\tcontactPrefix=\\"+385 \\"\\n\\t\\t\\tcontact=\\"976 480 800\\"\\n\\t\\t\\tbuttonCaption=\\"Open in dialer\\"\\n\\t\\t\\tbuttonUrl=\\"tel:+385976480800\\"\\n\\t\\t/>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"GitHub\\"\\n\\t\\t\\tcontactPrefix=\\"github.com/\\"\\n\\t\\t\\tcontact=\\"goranalkovic\\"\\n\\t\\t\\tbuttonCaption=\\"View my repos\\"\\n\\t\\t\\tbuttonUrl=\\"https://github.com/goranalkovic\\"\\n\\t\\t/>\\n\\t\\t<ContactItem\\n\\t\\t\\ttitle=\\"LinkedIn\\"\\n\\t\\t\\tcontactPrefix=\\"linkedin.com/in/\\"\\n\\t\\t\\tcontact=\\"goran-alkovi\u0107-b9569379\\"\\n\\t\\t\\tbuttonCaption=\\"Connect with me\\"\\n\\t\\t\\tbuttonUrl=\\"https://www.linkedin.com/in/goran-alkovi%C4%87-b9569379\\"\\n\\t\\t/>\\n\\t\\t<div class=\\"lg:row-span-2\\">\\n\\t\\t\\t<ContactItem\\n\\t\\t\\t\\ttitle=\\"Unsplash\\"\\n\\t\\t\\t\\tcontactPrefix=\\"unsplash.com/\\"\\n\\t\\t\\t\\tcontact=\\"@goran_alkovic\\"\\n\\t\\t\\t\\tbuttonCaption=\\"Explore my photos\\"\\n\\t\\t\\t\\tbuttonUrl=\\"https://unsplash.com/@goran_alkovic\\"\\n\\t\\t\\t/>\\n\\t\\t\\t<div class=\\"grid grid-cols-3 gap-15 w-full max-w-xs mt-30\\">\\n\\t\\t\\t\\t<img\\n\\t\\t\\t\\t\\tclass=\\"rounded object-cover select-none\\"\\n\\t\\t\\t\\t\\tsrc=\\"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-1_g3R9aJ96u.png?updatedAt=1627165984534\\"\\n\\t\\t\\t\\t\\talt=\\"My dog\\"\\n\\t\\t\\t\\t/>\\n\\t\\t\\t\\t<img\\n\\t\\t\\t\\t\\tclass=\\"rounded object-cover select-none\\"\\n\\t\\t\\t\\t\\tsrc=\\"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-2_gwmIcs_7yi.png?updatedAt=1627165984655\\"\\n\\t\\t\\t\\t\\talt=\\"Food on a table\\"\\n\\t\\t\\t\\t/>\\n\\t\\t\\t\\t<img\\n\\t\\t\\t\\t\\tclass=\\"rounded object-cover select-none\\"\\n\\t\\t\\t\\t\\tsrc=\\"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-3_va-tBjnDmh.png?updatedAt=1627165984865\\"\\n\\t\\t\\t\\t\\talt=\\"Sunset at the Vara\u017Edin student dorm\\"\\n\\t\\t\\t\\t/>\\n\\t\\t\\t</div>\\n\\t\\t</div>\\n\\t</div>\\n</section>\\n\\n<style lang=\\"postcss\\">section{padding-bottom:3.75rem;padding-top:7.5rem}@media (min-width:768px){section{padding-bottom:3.75rem;padding-top:11.25rem}}#about p{font-size:.875rem;line-height:1.5;transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1)}@media (min-width:768px){#about p{font-size:1.125rem;line-height:1.5}}</style>\\n"],"names":[],"mappings":"AA6KsB,mCAAO,CAAC,eAAe,OAAO,CAAC,YAAY,MAAM,CAAC,MAAM,AAAC,WAAW,KAAK,CAAC,CAAC,mCAAO,CAAC,eAAe,OAAO,CAAC,YAAY,QAAQ,CAAC,CAAC,oBAAM,CAAC,eAAC,CAAC,UAAU,OAAO,CAAC,YAAY,GAAG,CAAC,oBAAoB,IAAI,CAAC,oBAAoB,gBAAgB,CAAC,YAAY,CAAC,KAAK,CAAC,IAAI,CAAC,MAAM,CAAC,2BAA2B,aAAa,EAAE,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC,CAAC,CAAC,MAAM,AAAC,WAAW,KAAK,CAAC,CAAC,oBAAM,CAAC,eAAC,CAAC,UAAU,QAAQ,CAAC,YAAY,GAAG,CAAC,CAAC"}`
 };
 var Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$result.css.add(css);
-  return `${$$result.head += `${$$result.title = `<title>Goran Alkovi\u0107 - Developer &amp; designer</title>`, ""}<meta name="${"description"}" content="${"Goran Alkovi\u0107 - a frontend developer that also likes to design."}" data-svelte="svelte-11erwr3">`, ""}
+  return `${$$result.head += `${$$result.title = `<title>Goran Alkovi\u0107 | Developer &amp; designer</title>`, ""}<meta name="${"description"}" content="${"Goran Alkovi\u0107 - a frontend developer that also likes to design."}" data-svelte="svelte-vtqpfi">`, ""}
 
-<section id="${"intro"}" class="${"content-padding h-[90vh] !py-0 flex flex-col justify-center svelte-15brwd"}"><h1 class="${"max-w-[68rem]"}"><span class="${"text-transparent text-stroke-1 text-stroke-black dark:text-stroke-white"}">Hi! I&#39;m Goran.
+<section id="${"intro"}" class="${"content-padding h-[90vh] !py-0 flex flex-col justify-center svelte-ye5pxv"}"><h1 class="${"max-w-[68rem]"}"><span class="${"block text-transparent text-stroke-1 text-stroke-black dark:text-stroke-white"}">Hi! I&#39;m Goran.
 		</span>
-		<br>
-		A <span class="${"purple-text"}">frontend developer</span> that also likes to design.
-	</h1>
+		<span class="${"block"}">A <span class="${"purple-text"}">frontend developer</span> that also likes to design.
+		</span></h1>
 
 	${validate_component(ArrowButton, "ArrowButton").$$render($$result, {
     content: "Learn more about me",
@@ -2886,21 +5181,21 @@ var Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     extraClass: "mt-30 md:mt-60"
   }, {}, {})}</section>
 
-<section class="${"content-padding lg:flex lg:flex-row-reverse md:col-start-2 md:col-span-2 svelte-15brwd"}" id="${"about"}">${validate_component(AboutImage, "AboutImage").$$render($$result, {}, {}, {})}
+<section class="${"content-padding lg:flex lg:flex-row-reverse md:col-start-2 md:col-span-2 svelte-ye5pxv"}" id="${"about"}">${validate_component(AboutImage, "AboutImage").$$render($$result, {}, {}, {})}
 	<div class="${"flex flex-col gap-15 max-w-lg lg:max-w-420 md:mr-px mt-30 sm:mt-60 lg:mt-0 lg:mr-30"}"><h2><span class="${"purple-text"}">About</span> me</h2>
-		<p class="${"svelte-15brwd"}">I\u2019m a frontend developer who also likes to design. My philosophy is that everything should be
+		<p class="${"svelte-ye5pxv"}">I\u2019m a frontend developer who also likes to design. My philosophy is that everything should be
 			visually pleasing and easy to use, besides just doing its job.
 		</p>
-		<p class="${"svelte-15brwd"}">Throughout the years I tried a lot of technologies and fields in development, but what won at
+		<p class="${"svelte-ye5pxv"}">Throughout the years I tried a lot of technologies and fields in development, but what won at
 			the end was web development (mostly frontend).
 		</p>
-		<p class="${"svelte-15brwd"}">Design-wise I\u2019ve done some print design, but mostly I\u2019ve worked on digital design and UI/UX
+		<p class="${"svelte-ye5pxv"}">Design-wise I\u2019ve done some print design, but mostly I\u2019ve worked on digital design and UI/UX
 			for my personal projects.
 		</p>
-		<p class="${"svelte-15brwd"}">Currently working at <a class="${"underline  svelte-15brwd"}" href="${"https://infinum.com"}">Infinum</a> as a WordPress
+		<p class="${"svelte-ye5pxv"}">Currently working at <a class="${"underline "}" href="${"https://infinum.com"}">Infinum</a> as a WordPress
 			engineer, where I create custom Gutenberg block themes and work on the open-source Eightshift boilerplate.
 		</p>
-		<p class="${"svelte-15brwd"}">In my free time I love to drink coffee, explore what\u2019s new in tech, make crazy projects and
+		<p class="${"svelte-ye5pxv"}">In my free time I love to drink coffee, explore what\u2019s new in tech, make crazy projects and
 			game a bit here and there.
 		</p>
 		${validate_component(ArrowButton, "ArrowButton").$$render($$result, {
@@ -2915,7 +5210,7 @@ var Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     arrowDirection: ArrowDirections.DOWN
   }, {}, {})}</div></section>
 
-<section class="${"content-padding svelte-15brwd"}" id="${"work"}"><div class="${"sm:grid sm:grid-cols-2 sm:gap-15 md:gap-30 lg:grid-rows-[min,1fr,1fr,6rem]"}"><h2 class="${"mb-30 sm:mb-15 md:mb-0 sm:col-span-2 lg:col-span-1"}">Some of my <span class="${"purple-text"}">work</span></h2>
+<section class="${"content-padding svelte-ye5pxv"}" id="${"work"}"><div class="${"sm:grid sm:grid-cols-2 sm:gap-15 md:gap-30 lg:grid-rows-[min,1fr,1fr,6rem]"}"><h2 class="${"mb-30 sm:mb-15 md:mb-0 sm:col-span-2 lg:col-span-1"}">Some of my <span class="${"purple-text"}">work</span></h2>
 		${validate_component(WorkShowcaseCard, "WorkShowcaseCard").$$render($$result, {
     name: "Goc's recipe book",
     url: "https://recipes.goranalkovic.com",
@@ -2946,11 +5241,11 @@ var Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   }, {}, {})}
 		${validate_component(ArrowButton, "ArrowButton").$$render($$result, {
     content: "See more",
-    url: "#",
+    url: "/work",
     extraClass: "mt-15 sm:mt-30 md:mt-0 sm:col-start-1 lg:col-start-2 sm:!w-full h-full lg:justify-center rounded-md lg:border lg:border-gray-200 lg:hover:border-rich-purple-500 lg:hover:border-opacity-50 lg:dark:border-rich-purple-300 lg:dark:border-opacity-10 lg:dark:hover:border-opacity-50 lg:dark:hover:border-rich-purple-300 !transition"
   }, {}, {})}</div></section>
 
-<section id="${"contact"}" class="${"content-padding mb-[20vh] svelte-15brwd"}"><h2><span class="${"purple-text"}">Contact</span> &amp; socials</h2>
+<section id="${"contact"}" class="${"content-padding mb-[20vh] svelte-ye5pxv"}"><h2><span class="${"purple-text"}">Contact</span> &amp; socials</h2>
 
 	<div class="${"flex flex-col gap-30 mt-30 sm:mt-60 md:grid md:grid-cols-2 lg:grid-rows-2 lg:auto-cols-fr lg:grid-flow-col md:gap-x-30 md:gap-y-48 lg:gap-y-60 w-full"}">${validate_component(ContactItem, "ContactItem").$$render($$result, {
     title: "E-mail",
@@ -2985,31 +5280,26 @@ var Routes = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     contact: "@goran_alkovic",
     buttonCaption: "Explore my photos",
     buttonUrl: "https://unsplash.com/@goran_alkovic"
-  }, {}, {})}</div></div>
+  }, {}, {})}
+			<div class="${"grid grid-cols-3 gap-15 w-full max-w-xs mt-30"}"><img class="${"rounded object-cover select-none"}" src="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-1_g3R9aJ96u.png?updatedAt=1627165984534"}" alt="${"My dog"}">
+				<img class="${"rounded object-cover select-none"}" src="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-2_gwmIcs_7yi.png?updatedAt=1627165984655"}" alt="${"Food on a table"}">
+				<img class="${"rounded object-cover select-none"}" src="${"https://ik.imagekit.io/goranalkovic/personal_web/homepage/tr:n-180_square/unsplash-3_va-tBjnDmh.png?updatedAt=1627165984865"}" alt="${"Sunset at the Vara\u017Edin student dorm"}"></div></div></div>
 </section>`;
 });
-var index = /* @__PURE__ */ Object.freeze({
+var index$1 = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   [Symbol.toStringTag]: "Module",
   "default": Routes
 });
-var browser = false;
-var dev = false;
-var hydrate = dev;
-var router = browser;
-var prerender = true;
-var About = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  return `${$$result.head += `${$$result.title = `<title>About</title>`, ""}`, ""}
+var Work = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  return `${$$result.head += `${$$result.title = `<title>Goran Alkovi\u0107 | Work</title>`, ""}<meta name="${"description"}" content="${"Goran Alkovi\u0107 - a frontend developer that also likes to design."}" data-svelte="svelte-1ox6oqa">`, ""}
 
-About.`;
+<section class="${"my-180"}"><h1>Work</h1></section>`;
 });
-var about = /* @__PURE__ */ Object.freeze({
+var index = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   [Symbol.toStringTag]: "Module",
-  "default": About,
-  hydrate,
-  router,
-  prerender
+  "default": Work
 });
 
 // .svelte-kit/netlify/entry.js
