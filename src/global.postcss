@@ -9,10 +9,6 @@ main > * {
 html {
     overflow-x: hidden;
 }
-html,
-body {
-    scroll-behavior: smooth;
-}
 
 .purple-text {
     @apply text-rich-purple-500 dark:text-rich-purple-300;
@@ -22,7 +18,7 @@ footer p a {
     @apply font-medium hover:text-rich-purple-500 dark:hover:text-rich-purple-300;
 }
 
-.contained-width {
+.contained {
     @apply max-w-7xl mx-auto;
 }
 
@@ -32,4 +28,11 @@ h1 {
 
 h2 {
     @apply text-40 md:text-60 mt-48 sm:mt-0 mb-15 font-bold;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html,
+    body {
+        scroll-behavior: smooth;
+    }
 }
