@@ -15,10 +15,20 @@
 	export let arrowDirection = ArrowDirections.RIGHT;
 	export let external = false;
 	export let newTab = false;
+
+	let rel = '';
+
+	if (external) {
+		rel += 'external ';
+	}
+
+	if (newTab) {
+		rel += 'noreferrer noopener ';
+	}
 </script>
 
 <a
-	rel={external ? 'external' : (newTab ? 'noreferrer noopener' : '')}
+	rel
 	target={newTab ? '_blank' : '_self'}
 	class="flex items-center text-14w uppercase font-medium gap-5 group w-max p-px rounded-sm {extraClass}"
 	href={url}

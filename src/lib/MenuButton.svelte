@@ -4,6 +4,7 @@
 </script>
 
 <button
+	aria-label="Navigation menu toggle"
 	class:is-open={isMenuOpen}
 	class="sm:hidden mr-auto w-40 h-40 flex items-center justify-center transform transition hover:scale-110 hover:bg-rich-purple-500 hover:bg-opacity-10 dark:hover:bg-rich-purple-300 dark:hover:bg-opacity-30 rounded-md dark:active:bg-opacity-50 active:bg-opacity-20 {extraClass}"
 	on:click

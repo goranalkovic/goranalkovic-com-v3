@@ -27,7 +27,7 @@
     const transitonDuration = 'duration-500';
 </script>
 
-<button class="{extraClass} w-40 h-40 flex items-center justify-center transform transition hover:scale-110 hover:bg-rich-purple-500 hover:bg-opacity-10 dark:hover:bg-rich-purple-300 dark:hover:bg-opacity-30 rounded-md dark:active:bg-opacity-50 active:bg-opacity-20" on:click={toggleTheme} >
+<button class="{extraClass} w-40 h-40 flex items-center justify-center transform transition hover:scale-110 hover:bg-rich-purple-500 hover:bg-opacity-10 dark:hover:bg-rich-purple-300 dark:hover:bg-opacity-30 rounded-md dark:active:bg-opacity-50 active:bg-opacity-20" on:click={toggleTheme} aria-label="Toggle website theme" >
     <svg class="w-36 h-36" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <clipPath id="sun-clip">

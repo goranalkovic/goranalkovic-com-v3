@@ -32,12 +32,10 @@
 	class="h-80 sm:h-100 flex items-center px-30 sm:px-48 fixed top-0 left-0 right-0 bg-white bg-opacity-90 dark:bg-rich-purple-900 dark:bg-opacity-90 backdrop-blur-lg z-10"
 >
 	<nav class="contained w-full xl:px-48 flex items-center justify-between">
-		<ul class="flex items-center gap-30 text-16 w-full">
+		<div class="flex items-center gap-30 text-16 w-full">
 			<MenuButton on:click={() => (isOpen = !isOpen)} isMenuOpen={isOpen} extraClass="z-30" />
 
-			<li class="visible logo mr-auto sm:mr-0 z-20 sm:z-auto">
-				<a sveltekit:prefetch href="/" aria-label="Go to homepage"><Logo color /></a>
-			</li>
+				<a sveltekit:prefetch class="visible logo mr-auto sm:mr-0 z-20 sm:z-auto" href="/" aria-label="Go to homepage"><Logo color /></a>
 
 			{#if isOpen}
 				<div
@@ -51,26 +49,20 @@
 				class:open={isOpen}
 				class="fixed top-80 left-0 w-full max-w-xs sm:static flex flex-col sm:flex-row gap-30 bg-rich-purple-500 dark:bg-rich-purple-300 sm:bg-transparent sm:dark:bg-transparent p-30 sm:p-0 sm:w-max transition transform-gpu -translate-x-full sm:translate-x-0 rounded-br-xl sm:rounded-br-none rounded-tr-xl sm:rounded-tr-none shadow-2xl sm:shadow-none z-20 sm:z-auto"
 			>
-				<li class:active={$page.path === '/#about'} on:click={closeMenu}>
-					<a sveltekit:prefetch href="/#about">About me</a>
-				</li>
+					<a class:active={$page.path === '/#about'} on:click={closeMenu} sveltekit:prefetch href="/#about">About me</a>
 
 				{#if $page.path === '/'}
-					<li class:active={$page.path === '/#work'} on:click={closeMenu}>
-						<a sveltekit:prefetch href="#work">Work</a>
-					</li>
+						<a class:active={$page.path === '/#work'} on:click={closeMenu} sveltekit:prefetch href="#work">Work</a>
 				{:else}
-					<li class:active={$page.path.startsWith('/work')} on:click={closeMenu}>
-						<a sveltekit:prefetch href="/work">Work</a>
-					</li>
+						<a class:active={$page.path.startsWith('/work')} on:click={closeMenu} sveltekit:prefetch href="/work">Work</a>
 				{/if}
 
-				<li on:click={closeMenu}><a sveltekit:prefetch href="/#contact">Contact</a></li>
-				<li on:click={closeMenu}><a rel="external" sveltekit:prefetch href="/Goran-Alkovic-CV.pdf">CV</a></li>
+				<a on:click={closeMenu} sveltekit:prefetch href="/#contact">Contact</a>
+				<a on:click={closeMenu} rel="external" sveltekit:prefetch href="/Goran-Alkovic-CV.pdf">CV</a>
 			</div>
 
 			<ThemePicker extraClass="sm:ml-auto z-20 sm:z-auto" />
-		</ul>
+		</div>
 	</nav>
 </header>
 
