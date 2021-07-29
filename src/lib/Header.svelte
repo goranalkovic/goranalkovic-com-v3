@@ -35,7 +35,12 @@
 		<div class="flex items-center gap-30 text-16 w-full">
 			<MenuButton on:click={() => (isOpen = !isOpen)} isMenuOpen={isOpen} extraClass="z-30" />
 
-				<a sveltekit:prefetch class="visible logo mr-auto sm:mr-0 z-20 sm:z-auto" href="/" aria-label="Go to homepage"><Logo color /></a>
+			<a
+				sveltekit:prefetch
+				class="visible logo mr-auto sm:mr-0 z-20 sm:z-auto"
+				href="/"
+				aria-label="Go to homepage"><Logo color /></a
+			>
 
 			{#if isOpen}
 				<div
@@ -49,16 +54,23 @@
 				class:open={isOpen}
 				class="fixed top-80 left-0 w-full max-w-xs sm:static flex flex-col sm:flex-row gap-30 bg-rich-purple-500 dark:bg-rich-purple-300 sm:bg-transparent sm:dark:bg-transparent p-30 sm:p-0 sm:w-max transition transform-gpu -translate-x-full sm:translate-x-0 rounded-br-xl sm:rounded-br-none rounded-tr-xl sm:rounded-tr-none shadow-2xl sm:shadow-none z-20 sm:z-auto"
 			>
-					<a class:active={$page.path === '/#about'} on:click={closeMenu} sveltekit:prefetch href="/#about">About me</a>
+				<a
+					class:active={$page.path === '/#about'}
+					on:click={closeMenu}
+					sveltekit:prefetch
+					href="/#about">About me</a
+				>
 
-				{#if $page.path === '/'}
-						<a class:active={$page.path === '/#work'} on:click={closeMenu} sveltekit:prefetch href="#work">Work</a>
-				{:else}
-						<a class:active={$page.path.startsWith('/work')} on:click={closeMenu} sveltekit:prefetch href="/work">Work</a>
-				{/if}
+				<a
+					class:active={$page.path.startsWith('/work')}
+					on:click={closeMenu}
+					sveltekit:prefetch
+					href="/work">Work</a
+				>
 
 				<a on:click={closeMenu} sveltekit:prefetch href="/#contact">Contact</a>
-				<a on:click={closeMenu} rel="external" sveltekit:prefetch href="/Goran-Alkovic-CV.pdf">CV</a>
+				<a on:click={closeMenu} rel="external" sveltekit:prefetch href="/Goran-Alkovic-CV.pdf">CV</a
+				>
 			</div>
 
 			<ThemePicker extraClass="sm:ml-auto z-20 sm:z-auto" />
@@ -71,16 +83,15 @@
 		@apply translate-x-0;
 	}
 
-	nav ul li:not(.logo) {
+	nav ul a:not(.logo) {
 		@apply text-white sm:text-black sm:dark:text-white sm:hover:text-rich-purple-500 sm:dark:hover:text-rich-purple-300 transition-colors text-18 sm:text-16;
 	}
 
-	nav ul li:not(.logo) a {
+	nav ul a:not(.logo) {
 		@apply block;
 	}
 
-	nav ul li.active {
-		@apply pointer-events-none select-none sm:text-rich-purple-500 sm:dark:text-rich-purple-300 font-bold;
+	.active {
+		@apply pointer-events-none select-none sm:text-rich-purple-500 sm:dark:text-rich-purple-300 font-bold sm:font-normal;
 	}
-
 </style>
