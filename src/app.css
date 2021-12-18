@@ -1,3 +1,8 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
     @apply bg-white dark:bg-rich-purple-900 text-black dark:text-white transition-colors;
 }
@@ -38,6 +43,10 @@ a.underline {
     text-decoration-color: #322eff;
     text-underline-offset: 0.1em;
     text-decoration-thickness: 2px;
+}
+
+.underline-offset {
+    text-underline-offset: 0.1rem;
 }
 
 html.dark a.underline {

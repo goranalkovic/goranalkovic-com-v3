@@ -6,7 +6,7 @@
 class="border-t border-rich-purple-500 dark:border-rich-purple-300 border-opacity-5 dark:border-opacity-10 p-30 sm:px-60 sm:py-30 w-full"
 >
 <div class="contained flex items-center justify-between">
-    <div class="flex items-center gap-10 text-14 flex-shrink-0 mb-5 font-light">
+    <div class="flex items-center gap-10 text-14 shrink-0 mb-5 font-light">
         <Logo small />
         <span>&copy; 2021</span>
     </div>

@@ -29,7 +29,7 @@
 </script>
 
 <header
-	class="h-80 sm:h-100 flex items-center px-30 sm:px-48 fixed top-0 left-0 right-0 bg-white bg-opacity-90 dark:bg-rich-purple-900 dark:bg-opacity-90 backdrop-blur-lg z-10"
+	class="h-80 sm:h-100 flex items-center px-30 sm:px-48 fixed top-0 left-0 right-0 bg-white/90 dark:text-white dark:bg-rich-purple-900/90 text-gray-900 backdrop-blur-lg z-10"
 >
 	<nav class="contained w-full xl:px-48 flex items-center justify-between">
 		<div class="flex items-center gap-30 text-16 w-full">
@@ -44,7 +44,7 @@
 
 			{#if isOpen}
 				<div
-					class="w-screen h-screen bg-white dark:bg-rich-purple-900 bg-opacity-95 dark:bg-opacity-95 fixed inset-0 z-10 sm:hidden"
+					class="w-screen h-screen bg-white/95 dark:bg-rich-purple-900/95 fixed inset-0 z-10 sm:hidden"
 					on:click={closeMenu}
 					transition:fade
 				/>
@@ -62,10 +62,11 @@
 				>
 
 				<a
-					class:active={$page.path.startsWith('/work')}
+					class:current={$page.path.startsWith('/work')}
+					class:active={$page.path === '/#work'}
 					on:click={closeMenu}
 					sveltekit:prefetch
-					href="/work">Work</a
+					href="/#work">Work</a
 				>
 
 				<a on:click={closeMenu} sveltekit:prefetch href="/#contact">Contact</a>
@@ -93,5 +94,11 @@
 
 	.active {
 		@apply pointer-events-none select-none sm:text-rich-purple-500 sm:dark:text-rich-purple-300 font-bold sm:font-normal;
+	}
+
+	.current {
+		@apply underline;
+
+		text-underline-offset: 0.15rem;
 	}
 </style>

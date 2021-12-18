@@ -117,7 +117,7 @@
 	>
 		<ContactItem
 			title="E-mail"
-			contact="contact@goranalkovic.com"
+			contact="contact (at) goranalkovic.com"
 			buttonCaption="Send an email"
 			buttonUrl="mailto:contact@goranalkovic.com"
 		/>
@@ -134,6 +134,7 @@
 			contact="goranalkovic"
 			buttonCaption="View my repos"
 			buttonUrl="https://github.com/goranalkovic"
+			newTab
 		/>
 		<ContactItem
 			title="LinkedIn"
@@ -141,6 +142,7 @@
 			contact="goran-alković-b9569379"
 			buttonCaption="Connect with me"
 			buttonUrl="https://www.linkedin.com/in/goran-alkovi%C4%87-b9569379"
+			newTab
 		/>
 		<div class="lg:row-span-2">
 			<ContactItem
@@ -149,6 +151,7 @@
 				contact="@goran_alkovic"
 				buttonCaption="Explore my photos"
 				buttonUrl="https://unsplash.com/@goran_alkovic"
+				newTab
 			/>
 			<div class="grid grid-cols-3 gap-15 w-full max-w-xs mt-30">
 				<img
